@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.doanltmb.Product;
+
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -113,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkLogin(String username, String password) {
 
         SQLiteDatabase db = this.getReadableDatabase();
-
+// đây là dòng kết nói
         Cursor cursor = db.rawQuery(
                 "SELECT * FROM users WHERE username=? AND password=?",
                 new String[]{username, password}
@@ -137,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // GET PRODUCTS
+    // GET PRODUCTS (Hàm cũ trả về chuỗi)
     public ArrayList<String> getProducts() {
 
         ArrayList<String> list = new ArrayList<>();
@@ -157,4 +159,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    // --- HÀM MỚI THÊM VÀO: Lấy danh sách đối tượng Product từ Database ---
+    public ArrayList<Product> getAllProductsList() {
+        ArrayList<Product> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Lấy tên, giá và link ảnh từ bảng products
+        Cursor cursor = db.rawQuery("SELECT product_name, price, image_url FROM products", null);
+
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(0);
+            double price = cursor.getDouble(1);
+            String imageUrl = cursor.getString(2);
+
+            // Xử lý link ảnh nếu bị null
+            if (imageUrl == null) {
+                imageUrl = "";
+            }
+
+            // Định dạng lại giá tiền cho đẹp (ví dụ: 15000000 -> 15.000.000đ)
+            String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
+
+            // Thêm vào danh sách
+            list.add(new Product(name, formattedPrice, imageUrl));
+        }
+
+        cursor.close();
+        return list;
+    }
 }
