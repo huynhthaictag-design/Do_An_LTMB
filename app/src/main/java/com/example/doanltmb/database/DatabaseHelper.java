@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "store.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -90,11 +90,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO categories(category_name) VALUES('Laptop')");
         db.execSQL("INSERT INTO categories(category_name) VALUES('Tai nghe')");
 
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('iPhone 13','Apple smartphone',15000000,10,1)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('Samsung Galaxy S23','Samsung flagship',17000000,8,1)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('MacBook Air M1','Apple laptop',22000000,5,2)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('Dell XPS 13','Dell laptop',25000000,4,2)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('AirPods Pro','Tai nghe Apple',4500000,15,3)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('iPhone 13','Apple smartphone',15000000,10,1)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('Samsung Galaxy S23','Samsung flagship',17000000,8,1)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('MacBook Air M1','Apple laptop',22000000,5,2)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('Dell XPS 13','Dell laptop',25000000,4,2)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('AirPods Pro','Tai nghe Apple',4500000,15,3)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('SamSung Galaxy S21','Dien thoai Samsung',7000000,10,1)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('MacBook Pro M2','Apple laptop cao cấp',35000000,3,2)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('Google Pixel 7','Google smartphone',14000000,6,1)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('Sony WH-1000XM5','Tai nghe chống ồn Sony',8500000,12,3)");
+        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) " +
+                "VALUES('ASUS ROG Zephyrus','Laptop Gaming',42000000,2,2)");
     }
 
     @Override
