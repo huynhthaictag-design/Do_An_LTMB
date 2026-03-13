@@ -1,4 +1,4 @@
-package com.example.doanltmb;
+package com.example.doanltmb.model;
 
 public class Product {
     private String name;

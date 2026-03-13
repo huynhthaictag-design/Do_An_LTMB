@@ -1,4 +1,4 @@
-package com.example.doanltmb;
+package com.example.doanltmb.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
 
 public class RegisterActivity extends AppCompatActivity {

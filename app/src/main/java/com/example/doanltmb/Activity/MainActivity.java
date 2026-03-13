@@ -1,15 +1,15 @@
-package com.example.doanltmb;
+package com.example.doanltmb.Activity;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-// Import thêm DatabaseHelper
+import com.example.doanltmb.R;
+import com.example.doanltmb.adapter.*;
 import com.example.doanltmb.database.DatabaseHelper;
-
-import java.util.ArrayList;
+import com.example.doanltmb.model.Product;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,27 +23,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Tìm cái khung chứa sản phẩm trong file XML
+        setupRecyclerView();
+        setupBottomNavigation();
+    }
+
+    private void setupRecyclerView(){
+
+        // Tìm RecyclerView trong XML
         recyclerView = findViewById(R.id.recyclerViewProducts);
 
-        // Cài đặt hiển thị thành dạng lưới (Grid) có 2 cột
+        // Hiển thị dạng lưới 2 cột
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Khởi tạo DatabaseHelper
+        // Khởi tạo database
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
-        // Lấy danh sách sản phẩm thật từ SQLite
+        // Lấy danh sách sản phẩm
         productList = dbHelper.getAllProductsList();
 
-        // Đưa danh sách vào Adapter để "lắp ráp" lên màn hình
+        // Gắn adapter
         adapter = new ProductAdapter(productList);
         recyclerView.setAdapter(adapter);
+    }
 
-        // Xử lý thanh điều hướng dưới cùng
+    private void setupBottomNavigation(){
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setOnItemSelectedListener(item -> {
 
-            return true;
-        });
+//        bottomNav.setOnItemSelectedListener(item -> {
+//
+//            int id = item.getItemId();
+//
+//            if(id == R.id.nav_home){
+//
+//            }
+//
+//            if(id == R.id.nav_cart){
+//
+//            }
+//
+//            if(id == R.id.nav_profile){
+//
+//            }
+//
+//            return true;
+//        });
     }
 }
