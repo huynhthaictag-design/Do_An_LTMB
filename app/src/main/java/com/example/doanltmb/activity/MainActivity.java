@@ -1,5 +1,6 @@
-package com.example.doanltmb.Activity;
+package com.example.doanltmb.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -50,23 +51,25 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
 
-//        bottomNav.setOnItemSelectedListener(item -> {
-//
-//            int id = item.getItemId();
-//
-//            if(id == R.id.nav_home){
-//
-//            }
-//
+        bottomNav.setOnItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+            if(id == R.id.nav_home){
+
+            }
+
 //            if(id == R.id.nav_cart){
 //
 //            }
-//
-//            if(id == R.id.nav_profile){
-//
-//            }
-//
-//            return true;
-//        });
+
+            if(id == R.id.nav_profile){
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            return true;
+        });
     }
 }

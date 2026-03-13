@@ -1,4 +1,4 @@
-package com.example.doanltmb.Activity;
+package com.example.doanltmb.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
