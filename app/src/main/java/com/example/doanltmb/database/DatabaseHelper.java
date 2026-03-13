@@ -85,6 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("INSERT INTO users(username,password,role) VALUES('admin','123456','admin')");
         db.execSQL("INSERT INTO users(username,password,role) VALUES('tai','123456','customer')");
+        db.execSQL("INSERT INTO users(username,password,role) VALUES('thai','123456','customer')");
 
         db.execSQL("INSERT INTO categories(category_name) VALUES('Điện thoại')");
         db.execSQL("INSERT INTO categories(category_name) VALUES('Laptop')");
