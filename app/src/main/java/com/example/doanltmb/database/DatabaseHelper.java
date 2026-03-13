@@ -130,13 +130,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkLogin(String username, String password) {
 
         SQLiteDatabase db = this.getReadableDatabase();
-// đây là dòng kết nói
+
         Cursor cursor = db.rawQuery(
                 "SELECT * FROM users WHERE username=? AND password=?",
                 new String[]{username, password}
         );
 
-        return cursor.getCount() > 0;
+        boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        db.close();
+
+        return result;
     }
 
     // REGISTER
@@ -144,12 +149,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM users WHERE username=?",
+                new String[]{username}
+        );
+
+        if(cursor.getCount() > 0){
+            cursor.close();
+            return false;
+        }
+
         ContentValues values = new ContentValues();
         values.put("username", username);
         values.put("password", password);
         values.put("role", "customer");
 
         long result = db.insert("users", null, values);
+
+        cursor.close();
+        db.close();
 
         return result != -1;
     }

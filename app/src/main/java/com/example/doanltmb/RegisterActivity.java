@@ -2,9 +2,11 @@ package com.example.doanltmb;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.doanltmb.database.DatabaseHelper;
 
 public class RegisterActivity extends AppCompatActivity {
     @Override
@@ -18,5 +20,40 @@ public class RegisterActivity extends AppCompatActivity {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
         });
+
+        DatabaseHelper db = new DatabaseHelper(this);
+
+        Button registerButton = findViewById(R.id.registerButton);
+        EditText username = findViewById(R.id.nameInput);
+        EditText password = findViewById(R.id.passwordInput);
+
+        try {
+            registerButton.setOnClickListener(v -> {
+
+                String u = username.getText().toString();
+                String p = password.getText().toString();
+
+                boolean result = db.registerUser(u,p);
+
+                if(result){
+
+                    Toast.makeText(this,"Register success",Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                }else{
+
+                    Toast.makeText(this,"Username already exists",Toast.LENGTH_SHORT).show();
+
+                }
+
+            });
+        }
+        catch (Exception e) {
+            Toast.makeText(this, "Error: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
