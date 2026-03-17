@@ -8,55 +8,64 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.utils.HashUtil;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private EditText usernameInput, passwordInput;
+    private Button loginButton;
+    private TextView registerText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Dòng này cực kỳ quan trọng: Nó kết nối code với giao diện XML của bạn
         setContentView(R.layout.activity_login);
 
-        //Chuyển từ Login sang Regis
-        TextView registerText = findViewById(R.id.registerText);
-        registerText.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+        // Ánh xạ view
+        usernameInput = findViewById(R.id.emailInput);
+        passwordInput = findViewById(R.id.passwordInput);
+        loginButton = findViewById(R.id.loginButton);
+        registerText = findViewById(R.id.registerText);
 
-        //Đăng nhập
         DatabaseHelper db = new DatabaseHelper(this);
 
-        Button loginButton = findViewById(R.id.loginButton);
-        EditText username = findViewById(R.id.emailInput);
-        EditText password = findViewById(R.id.passwordInput);
+        // Chuyển sang Register
+        registerText.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        });
 
-        try {
-            loginButton.setOnClickListener(v -> {
+        // Xử lý login
+        loginButton.setOnClickListener(v -> {
 
-                String u = username.getText().toString();
-                String p = password.getText().toString();
+            String username = usernameInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
 
-                boolean check = db.checkLogin(u,p);
+            // Validate
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                if(check){
+            try {
+                // Hash password
+                String hashedPassword = HashUtil.hashPassword(password);
 
-                    Toast.makeText(this,"Login success",Toast.LENGTH_SHORT).show();
+                boolean check = db.checkLogin(username, hashedPassword);
+
+                if (check) {
+                    Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
 
-                }else{
-
-                    Toast.makeText(this,"Invalid account",Toast.LENGTH_SHORT).show();
-
+                } else {
+                    Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                 }
 
-            });
-        } catch (Exception e) {
-            Toast.makeText(this, "Error: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
-        }
-
+            } catch (Exception e) {
+                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

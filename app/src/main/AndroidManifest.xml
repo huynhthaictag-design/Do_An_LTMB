@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DoAnLTMB">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true">
 <!--            Test app-->
 
@@ -25,9 +25,9 @@
         <activity
             android:name=".activity.RegisterActivity"
             android:exported="false"/>
-<!--        <activity-->
-<!--            android:name=".activity.MainActivity"-->
-<!--            android:exported="false"/>-->
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="false"/>
         <activity
             android:name=".activity.ProfileActivity"
             android:exported="false"/>

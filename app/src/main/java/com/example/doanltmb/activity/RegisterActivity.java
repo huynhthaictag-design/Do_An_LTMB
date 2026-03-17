@@ -8,53 +8,68 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.utils.HashUtil;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private EditText usernameInput, passwordInput;
+    private Button registerButton;
+    private TextView loginText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Dòng này cực kỳ quan trọng: Nó kết nối code với giao diện XML của bạn
         setContentView(R.layout.activity_regis);
 
-        TextView loginText = findViewById(R.id.loginText);
-        loginText.setOnClickListener(view -> {
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
+        // Ánh xạ view
+        usernameInput = findViewById(R.id.nameInput);
+        passwordInput = findViewById(R.id.passwordInput);
+        registerButton = findViewById(R.id.registerButton);
+        loginText = findViewById(R.id.loginText);
 
         DatabaseHelper db = new DatabaseHelper(this);
 
-        Button registerButton = findViewById(R.id.registerButton);
-        EditText username = findViewById(R.id.nameInput);
-        EditText password = findViewById(R.id.passwordInput);
+        // Chuyển sang Login
+        loginText.setOnClickListener(v -> {
+            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+        });
 
-        try {
-            registerButton.setOnClickListener(v -> {
+        // Xử lý đăng ký
+        registerButton.setOnClickListener(v -> {
 
-                String u = username.getText().toString();
-                String p = password.getText().toString();
+            String username = usernameInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
 
-                boolean result = db.registerUser(u,p);
+            // Validate
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Không được để trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                if(result){
+            if (password.length() < 6) {
+                Toast.makeText(this, "Mật khẩu tối thiểu 6 ký tự", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                    Toast.makeText(this,"Register success",Toast.LENGTH_SHORT).show();
+            try {
+                // Hash password
+                String hashedPassword = HashUtil.hashPassword(password);
 
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(intent);
+                boolean result = db.registerUser(username, hashedPassword);
+
+                if (result) {
+                    Toast.makeText(this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+
+                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     finish();
 
-                }else{
-
-                    Toast.makeText(this,"Username already exists",Toast.LENGTH_SHORT).show();
-
+                } else {
+                    Toast.makeText(this, "Username đã tồn tại", Toast.LENGTH_SHORT).show();
                 }
 
-            });
-        }
-        catch (Exception e) {
-            Toast.makeText(this, "Error: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
-        }
+            } catch (Exception e) {
+                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

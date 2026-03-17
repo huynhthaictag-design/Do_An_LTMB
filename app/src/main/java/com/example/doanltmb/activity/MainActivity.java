@@ -50,24 +50,24 @@ public class MainActivity extends AppCompatActivity {
     private void setupBottomNavigation(){
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-
+        bottomNav.setSelectedItemId(R.id.nav_home); //Để mặc định trang chính
         bottomNav.setOnItemSelectedListener(item -> {
 
             int id = item.getItemId();
 
-            if(id == R.id.nav_home){
-
-            }
+//            if(id == R.id.nav_home){
+//
+//            }
 
 //            if(id == R.id.nav_cart){
 //
 //            }
 
-            if(id == R.id.nav_profile){
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                finish();
-            }
+//            if(id == R.id.nav_profile){
+//                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
 
             return true;
         });
