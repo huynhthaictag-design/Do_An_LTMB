@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#F5F7F8">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng Sản Phẩm Mới"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#0056b2"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/inputProductName"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Tên sản phẩm (VD: iPhone 15)"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/inputProductPrice"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Giá tiền (VD: 20000000)"
+        android:inputType="numberDecimal"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/inputProductImage"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Link ảnh sản phẩm (URL)"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnSaveProduct"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="Lưu Sản Phẩm"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#0056b2"
+        android:textStyle="bold"/>
+</LinearLayout>

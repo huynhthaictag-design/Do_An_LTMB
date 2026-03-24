@@ -128,6 +128,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // GET PRODUCTS
+    public boolean addProduct(String name, double price, String imageUrl) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues values = new android.content.ContentValues();
+
+        values.put("product_name", name);
+        values.put("price", price);
+        values.put("image_url", imageUrl);
+        // Tạm thời fix cứng các thông tin chưa cần thiết để form đơn giản
+        values.put("description", "Mô tả sản phẩm mới");
+        values.put("stock", 10);
+        values.put("category_id", 1);
+
+        long result = db.insert("products", null, values);
+        db.close();
+
+        return result != -1; // Nếu insert thành công result sẽ khác -1
+    }
     public ArrayList<Product> getAllProductsList() {
 
         ArrayList<Product> list = new ArrayList<>();

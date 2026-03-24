@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBottomNavigation(){
 
-<<<<<<< HEAD:app/src/main/java/com/example/doanltmb/MainActivity.java
-        // Xử lý thanh điều hướng dưới cùng
         // Xử lý thanh điều hướng dưới cùng
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
 
@@ -76,29 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             return false;
-=======
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_home); //Để mặc định trang chính
-        bottomNav.setOnItemSelectedListener(item -> {
-
-            int id = item.getItemId();
-
-//            if(id == R.id.nav_home){
-//
-//            }
-
-//            if(id == R.id.nav_cart){
-//
-//            }
-
-//            if(id == R.id.nav_profile){
-//                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-
-            return true;
->>>>>>> fb6769e0cb9aed72adcbd39de416ba07f18514e1:app/src/main/java/com/example/doanltmb/activity/MainActivity.java
         });
     }
 }
