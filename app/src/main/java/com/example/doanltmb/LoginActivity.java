@@ -35,27 +35,30 @@ public class LoginActivity extends AppCompatActivity {
                 String u = username.getText().toString();
                 String p = password.getText().toString();
 
-                boolean check = db.checkLogin(u,p);
+                boolean check = db.checkLogin(u, p);
 
-                if(check){
+                if (check) {
+                    // --- ĐOẠN LƯU TÊN ĐĂNG NHẬP PHẢI NẰM Ở ĐÂY ---
+                    android.content.SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("USERNAME", u); // Lưu tên người dùng
+                    editor.apply();
+                    // ------------------------------------------
 
-                    Toast.makeText(this,"Login success",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
 
-                }else{
-
-                    Toast.makeText(this,"Invalid account",Toast.LENGTH_SHORT).show();
-
+                } else {
+                    Toast.makeText(this, "Invalid account", Toast.LENGTH_SHORT).show();
                 }
 
             });
         } catch (Exception e) {
-            Toast.makeText(this, "Error: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 
+        }
     }
 }

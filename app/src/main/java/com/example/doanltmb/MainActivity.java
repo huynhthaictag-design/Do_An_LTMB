@@ -1,5 +1,6 @@
 package com.example.doanltmb;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -40,10 +41,31 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         // Xử lý thanh điều hướng dưới cùng
+        // Xử lý thanh điều hướng dưới cùng
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setOnItemSelectedListener(item -> {
 
-            return true;
+        // Mặc định chọn tab Home khi đang ở MainActivity
+        bottomNav.setSelectedItemId(R.id.nav_home);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home) {
+                // Đang ở trang chủ rồi thì không làm gì cả
+                return true;
+            } else if (itemId == R.id.nav_category) {
+                // TODO: Chuyển sang trang Danh mục (nếu có)
+                return true;
+            } else if (itemId == R.id.nav_favorite) {
+                // TODO: Chuyển sang trang Yêu thích (nếu có)
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                // Chuyển sang trang Tài khoản
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
     }
 }
