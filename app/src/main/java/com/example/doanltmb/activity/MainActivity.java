@@ -1,16 +1,16 @@
-package com.example.doanltmb;
+package com.example.doanltmb.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-// Import thêm DatabaseHelper
+import com.example.doanltmb.R;
+import com.example.doanltmb.adapter.*;
 import com.example.doanltmb.database.DatabaseHelper;
-
-import java.util.ArrayList;
+import com.example.doanltmb.model.Product;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,22 +24,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Tìm cái khung chứa sản phẩm trong file XML
+        setupRecyclerView();
+        setupBottomNavigation();
+    }
+
+    private void setupRecyclerView(){
+
+        // Tìm RecyclerView trong XML
         recyclerView = findViewById(R.id.recyclerViewProducts);
 
-        // Cài đặt hiển thị thành dạng lưới (Grid) có 2 cột
+        // Hiển thị dạng lưới 2 cột
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Khởi tạo DatabaseHelper
+        // Khởi tạo database
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
-        // Lấy danh sách sản phẩm thật từ SQLite
+        // Lấy danh sách sản phẩm
         productList = dbHelper.getAllProductsList();
 
-        // Đưa danh sách vào Adapter để "lắp ráp" lên màn hình
+        // Gắn adapter
         adapter = new ProductAdapter(productList);
         recyclerView.setAdapter(adapter);
+    }
 
+    private void setupBottomNavigation(){
+
+<<<<<<< HEAD:app/src/main/java/com/example/doanltmb/MainActivity.java
         // Xử lý thanh điều hướng dưới cùng
         // Xử lý thanh điều hướng dưới cùng
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
@@ -66,6 +76,29 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             return false;
+=======
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+        bottomNav.setSelectedItemId(R.id.nav_home); //Để mặc định trang chính
+        bottomNav.setOnItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+//            if(id == R.id.nav_home){
+//
+//            }
+
+//            if(id == R.id.nav_cart){
+//
+//            }
+
+//            if(id == R.id.nav_profile){
+//                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+
+            return true;
+>>>>>>> fb6769e0cb9aed72adcbd39de416ba07f18514e1:app/src/main/java/com/example/doanltmb/activity/MainActivity.java
         });
     }
 }
