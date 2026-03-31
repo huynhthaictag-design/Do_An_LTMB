@@ -10,53 +10,46 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đăng Sản Phẩm Mới"
+        android:text="Chỉnh Sửa Hồ Sơ"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#0056b2"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="30dp"
         android:layout_marginTop="20dp"/>
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_launcher_background"
+        android:layout_marginBottom="20dp"/>
+
     <EditText
-        android:id="@+id/nameInput"
+        android:id="@+id/editFullName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên sản phẩm (Vd: iPhone 16)"
-        android:inputType="text"
+        android:hint="Họ và tên mới"
         android:padding="15dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="15dp"
         android:background="@android:drawable/edit_text"/>
 
     <EditText
-        android:id="@+id/priceInput"
+        android:id="@+id/editPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Giá sản phẩm (Vd: 17000000)"
-        android:inputType="number"
+        android:hint="Số điện thoại mới"
+        android:inputType="phone"
         android:padding="15dp"
-        android:layout_marginBottom="16dp"
-        android:background="@android:drawable/edit_text"/>
-
-    <EditText
-        android:id="@+id/urlInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Link ảnh sản phẩm (URL)"
-        android:inputType="textUri"
-        android:padding="15dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="30dp"
         android:background="@android:drawable/edit_text"/>
 
     <Button
-        android:id="@+id/saveButton"
+        android:id="@+id/btnSaveProfile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="LƯU SẢN PHẨM"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:text="LƯU THÔNG TIN"
         android:backgroundTint="#0056b2"
+        android:textColor="#FFFFFF"
         android:padding="15dp"
-        android:elevation="4dp"/>
+        android:textStyle="bold"/>
 
 </LinearLayout>
