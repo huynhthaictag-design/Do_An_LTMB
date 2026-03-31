@@ -1,4 +1,4 @@
-package com.example.doanltmb.activity;
+package com.example.doanltmb.activity.admin;
 
 import android.os.Bundle;
 import android.widget.Button;

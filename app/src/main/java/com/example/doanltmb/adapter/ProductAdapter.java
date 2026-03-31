@@ -1,57 +1,88 @@
 package com.example.doanltmb.adapter;
+
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.activity.user.ProductDetailActivity;
 import com.example.doanltmb.model.Product;
 
 import java.util.List;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
-    private List<Product> productList;
+    private Context context;
+    private List<Product> list;
 
-    public ProductAdapter(List<Product> productList) {
-        this.productList = productList;
+    public ProductAdapter(Context context, List<Product> list) {
+        this.context = context;
+        this.list = list;
     }
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
-        return new ProductViewHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.item_product, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        Product product = productList.get(position);
-        holder.textProductName.setText(product.getName());
-        holder.textProductPrice.setText(product.getPrice());
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        // Gợi ý: Sử dụng thư viện Glide hoặc Picasso để load ảnh từ URL vào holder.imageProduct
-        // Glide.with(holder.itemView.getContext()).load(product.getImageUrl()).into(holder.imageProduct);
+        Product p = list.get(position);
+
+        // set tên + giá
+        holder.txtName.setText(p.getName());
+        holder.txtPrice.setText(p.getPrice());
+
+        // set ảnh từ drawable
+        String imageName = p.getImageUrl(); // ví dụ: iphone13
+
+        int resId = context.getResources().getIdentifier(
+                imageName,
+                "drawable",
+                context.getPackageName()
+        );
+
+        if (resId != 0) {
+            holder.img.setImageResource(resId);
+        } else {
+            // ảnh mặc định nếu sai tên
+            holder.img.setImageResource(R.drawable.ic_launcher_background);
+        }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailActivity.class);
+            intent.putExtra("product_id", position + 1); // hoặc id thật nếu có
+            context.startActivity(intent);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return productList.size();
+        return list.size();
     }
 
-    static class ProductViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageProduct;
-        TextView textProductName;
-        TextView textProductPrice;
+    // ViewHolder
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ProductViewHolder(@NonNull View itemView) {
+        ImageView img;
+        TextView txtName, txtPrice;
+
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageProduct = itemView.findViewById(R.id.imageProduct);
-            textProductName = itemView.findViewById(R.id.textProductName);
-            textProductPrice = itemView.findViewById(R.id.textProductPrice);
+
+            img = itemView.findViewById(R.id.imageProduct);
+            txtName = itemView.findViewById(R.id.textProductName);
+            txtPrice = itemView.findViewById(R.id.textProductPrice);
         }
     }
 }

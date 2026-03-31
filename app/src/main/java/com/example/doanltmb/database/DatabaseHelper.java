@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "store.db";
-    private static final int DATABASE_VERSION = 5; // tăng version để reset DB
+    private static final int DATABASE_VERSION = 7;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,19 +55,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String adminPass = HashUtil.hashPassword("123123");
         String userPass = HashUtil.hashPassword("123456");
 
-        db.execSQL("INSERT INTO users(username,password,role) VALUES('admin','" + adminPass + "','admin')");
-        db.execSQL("INSERT INTO users(username,password,role) VALUES('tai','" + userPass + "','customer')");
-        db.execSQL("INSERT INTO users(username,password,role) VALUES('thai','" + userPass + "','customer')");
+        // INSERT SAMPLE USERS
+        String sqlUsers = "INSERT INTO users(username,password,role) VALUES " +
+            "('admin','" + adminPass + "','admin'), " +
+            "('tai','" + userPass + "','customer'), " +
+            "('thai','" + userPass + "','customer')";
+        db.execSQL(sqlUsers);
 
-        db.execSQL("INSERT INTO categories(category_name) VALUES('Điện thoại')");
-        db.execSQL("INSERT INTO categories(category_name) VALUES('Laptop')");
-        db.execSQL("INSERT INTO categories(category_name) VALUES('Tai nghe')");
+        // INSERT SAMPLE CATEGORIES
+        String sqlCategories = "INSERT INTO categories(category_name) VALUES " +
+                "('Điện thoại'), " +
+                "('Laptop'), " +
+                "('Tai nghe')";
+        db.execSQL(sqlCategories);
 
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('iPhone 13','Apple smartphone',15000000,10,1)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('Samsung Galaxy S23','Samsung flagship',17000000,8,1)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('MacBook Air M1','Apple laptop',22000000,5,2)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('Dell XPS 13','Dell laptop',25000000,4,2)");
-        db.execSQL("INSERT INTO products(product_name,description,price,stock,category_id) VALUES('AirPods Pro','Tai nghe Apple',4500000,15,3)");
+        String sqlProducts = "INSERT INTO products(product_name, description, price, stock, image_url, category_id) VALUES " +
+                "('iPhone 13', 'Điện Thoại iPhone 13 Chính Hãng.\n" +
+                "Màn hình: 6.1 inchs - Super Retina XDR OLED 120Hz.\u200B\n" +
+                "CPU : Apple A15 .\n" +
+                "Hệ điều hành: IOS 15.\n" +
+                "Ram: 4 GB. \n" +
+                "Rom: 128GB; 256GB.\n" +
+                "Camera trước: 12 Mpx.\n" +
+                "Camera sau: 2 Camera 12 x 12 Mpx.\n" +
+                "Pin: 3,240 mAh, Sạc Nhanh 20w , Hỗ trợ sạc không dây.\n" +
+                "Mạng : Tốc độ 5G.\n" +
+                "Sim: 1 Nano Sim & 1 esim.', 15000000, 10,'iphone13', 1), " +
+                //SamSung
+                "('Samsung Galaxy S23', 'SAMSUNG GALAXY S23 5G CHÍNH HÃNG\n" +
+                "Màn hình: 6.1 inchs, Dynamic Amoled 2X.\u200B\n" +
+                "CPU : SnapDragon 8 Gen 2 for Galaxy.\n" +
+                "Hệ điều hành: Android 15.\n" +
+                "Ram: 8GB. \n" +
+                "Rom: 128GB, 256GB, 512GB.\n" +
+                "Camera trước: 12 Mp.\n" +
+                "Camera sau: Chính 50 MP+ 12 MP+ 10 MP.\n" +
+                "Pin: 3.900 mAh, Sạc Nhanh 25W.\n" +
+                "Mạng : Tốc độ 5G.', 17000000, 8, 'samsungs23', 1), " +
+                "('MacBook Air M1', 'Apple laptop', 22000000, 5, 'macbookairm1', 2), " +
+                "('Dell XPS 13', 'Dell laptop', 25000000, 4, 'dellxps13', 2), " +
+                "('AirPods Pro', 'Tai nghe Apple', 4500000, 15, 'airpodspro',3)";
+
+        db.execSQL(sqlProducts);
     }
 
     @Override
@@ -80,7 +109,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // LOGIN (KHÔNG HASH Ở ĐÂY)
     public boolean checkLogin(String username, String password) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -98,7 +126,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    // REGISTER (KHÔNG HASH Ở ĐÂY)
     public boolean registerUser(String username, String password) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -151,7 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT product_name, price, image_url FROM products", null
+                "SELECT product_name, price, image_url, description FROM products", null
         );
 
         while (cursor.moveToNext()) {
@@ -159,17 +186,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String name = cursor.getString(0);
             double price = cursor.getDouble(1);
             String imageUrl = cursor.getString(2);
+            String description = cursor.getString(3);
 
             if (imageUrl == null) imageUrl = "";
 
             String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
 
-            list.add(new Product(name, formattedPrice, imageUrl));
+                list.add(new Product(name, formattedPrice, imageUrl, description));
         }
 
         cursor.close();
         db.close();
 
         return list;
+    }
+    public Product getProductById(int id) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT product_name, price, image_url, description FROM products WHERE product_id=?",
+                new String[]{String.valueOf(id)}
+        );
+
+        Product product = null;
+
+        if (cursor.moveToFirst()) {
+
+            String name = cursor.getString(0);
+            double price = cursor.getDouble(1);
+            String image = cursor.getString(2);
+            String desc = cursor.getString(3);
+
+            String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
+
+            product = new Product(name, formattedPrice, image, desc);
+        }
+
+        cursor.close();
+        return product;
     }
 }

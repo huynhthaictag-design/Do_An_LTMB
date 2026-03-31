@@ -48,8 +48,8 @@
         android:id="@+id/btnSaveProduct"
         android:layout_width="match_parent"
         android:layout_height="55dp"
+        android:backgroundTint="#0056b2"
         android:text="Lưu Sản Phẩm"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#0056b2"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 </LinearLayout>
