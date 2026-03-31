@@ -5,45 +5,74 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
 
 public class AddProductActivity extends AppCompatActivity {
+
+    private EditText nameInput, priceInput, urlInput;
+    private Button saveButton;
+    private DatabaseHelper db;
+
+    private boolean isEditMode = false;
+    private String oldProductName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
 
-        EditText inputName = findViewById(R.id.inputProductName);
-        EditText inputPrice = findViewById(R.id.inputProductPrice);
-        EditText inputImage = findViewById(R.id.inputProductImage);
-        Button btnSave = findViewById(R.id.btnSaveProduct);
+        db = new DatabaseHelper(this);
 
-        DatabaseHelper db = new DatabaseHelper(this);
+        nameInput = findViewById(R.id.nameInput);
+        priceInput = findViewById(R.id.priceInput);
+        urlInput = findViewById(R.id.urlInput);
+        saveButton = findViewById(R.id.saveButton);
 
-        btnSave.setOnClickListener(v -> {
-            String name = inputName.getText().toString();
-            String priceStr = inputPrice.getText().toString();
-            String image = inputImage.getText().toString();
+        // KIỂM TRA CHẾ ĐỘ: THÊM HAY SỬA
+        isEditMode = getIntent().getBooleanExtra("IS_EDIT", false);
 
-            if (name.isEmpty() || priceStr.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập tên và giá!", Toast.LENGTH_SHORT).show();
+        if (isEditMode) {
+            // Nếu là Sửa: Điền dữ liệu cũ vào các ô
+            saveButton.setText("CẬP NHẬT SẢN PHẨM");
+            oldProductName = getIntent().getStringExtra("OLD_NAME");
+            nameInput.setText(oldProductName);
+
+            // Xử lý giá: Bỏ chữ 'đ' để admin nhập số cho dễ
+            String price = getIntent().getStringExtra("OLD_PRICE");
+            if (price != null) {
+                priceInput.setText(price.replace("đ", ""));
+            }
+
+            urlInput.setText(getIntent().getStringExtra("OLD_URL"));
+        }
+
+        saveButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            String price = priceInput.getText().toString().trim();
+            String url = urlInput.getText().toString().trim();
+
+            if (name.isEmpty() || price.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đủ tên và giá!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            try {
-                double price = Double.parseDouble(priceStr);
-                boolean success = db.addProduct(name, price, image);
-
-                if (success) {
-                    Toast.makeText(this, "Đăng sản phẩm thành công!", Toast.LENGTH_SHORT).show();
-                    finish(); // Tự động đóng trang này và quay về trang chủ
+            if (isEditMode) {
+                // Lệnh CẬP NHẬT
+                int result = db.updateProduct(oldProductName, name, price + "đ", url);
+                if (result > 0) {
+                    Toast.makeText(this, "Đã cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
-                    Toast.makeText(this, "Lỗi khi lưu vào database", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
                 }
-            } catch (Exception e) {
-                Toast.makeText(this, "Giá tiền không hợp lệ!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Lệnh THÊM MỚI
+                long result = db.addProduct(name, price + "đ", url);
+                if (result != -1) {
+                    Toast.makeText(this, "Đã thêm sản phẩm mới!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         });
     }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#FFFFFF"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chỉnh Sửa Hồ Sơ"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#0056b2"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="20dp"/>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_launcher_background"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/editFullName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Họ và tên mới"
+        android:padding="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@android:drawable/edit_text"/>
+
+    <EditText
+        android:id="@+id/editPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số điện thoại mới"
+        android:inputType="phone"
+        android:padding="15dp"
+        android:layout_marginBottom="30dp"
+        android:background="@android:drawable/edit_text"/>
+
+    <Button
+        android:id="@+id/btnSaveProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LƯU THÔNG TIN"
+        android:backgroundTint="#0056b2"
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:textStyle="bold"/>
+
+</LinearLayout>
