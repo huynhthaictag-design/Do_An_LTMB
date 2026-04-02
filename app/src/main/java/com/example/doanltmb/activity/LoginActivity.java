@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.activity.user.MainActivity;
 import com.example.doanltmb.database.DatabaseHelper;
 
 public class LoginActivity extends AppCompatActivity {
@@ -43,6 +44,13 @@ public class LoginActivity extends AppCompatActivity {
                 editor.apply();
 
                 Toast.makeText(this, "Đăng nhập thành công với quyền " + role, Toast.LENGTH_SHORT).show();
+                //Mở màn hình chính
+                if (role.equals("admin")) {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                } else {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                }
+
                 finish();
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();

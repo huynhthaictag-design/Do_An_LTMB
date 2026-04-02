@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.doanltmb">
-
-    <uses-permission android:name="android.permission.INTERNET" />
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="Cửa hàng điện tử"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DoAnLTMB"
-        tools:targetApi="31">
+        android:theme="@style/Theme.DoAnLTMB">
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,25 +22,26 @@
         </activity>
 
         <activity
-            android:name=".activity.LoginActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".activity.RegisterActivity"
-            android:exported="false" />
+            android:exported="false"/>
 
         <activity
-            android:name=".activity.ProfileActivity"
-            android:exported="false" />
+            android:name=".activity.user.MainActivity"
+            android:exported="false"/>
 
+        <activity
+            android:name=".activity.user.ProfileActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".activity.admin.AddProductActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.user.ProductDetailActivity"
+            android:exported="false"/>
         <activity
             android:name=".activity.EditProfileActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".activity.AddProductActivity"
-            android:exported="false" />
+            android:exported="false"/>
 
     </application>
-
 </manifest>

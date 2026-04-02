@@ -3,60 +3,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:background="#FFFFFF"
-    android:gravity="center_horizontal">
+    android:padding="24dp"
+    android:background="#F5F7F8">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Đăng Sản Phẩm Mới"
-        android:textSize="22sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#0056b2"
-        android:layout_marginBottom="32dp"
-        android:layout_marginTop="20dp"/>
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
 
     <EditText
-        android:id="@+id/nameInput"
+        android:id="@+id/inputProductName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Tên sản phẩm (Vd: iPhone 16)"
-        android:inputType="text"
-        android:padding="15dp"
-        android:layout_marginBottom="16dp"
-        android:background="@android:drawable/edit_text"/>
+        android:layout_height="55dp"
+        android:hint="Tên sản phẩm (VD: iPhone 15)"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/priceInput"
+        android:id="@+id/inputProductPrice"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Giá sản phẩm (Vd: 17000000)"
-        android:inputType="number"
-        android:padding="15dp"
-        android:layout_marginBottom="16dp"
-        android:background="@android:drawable/edit_text"/>
+        android:layout_height="55dp"
+        android:hint="Giá tiền (VD: 20000000)"
+        android:inputType="numberDecimal"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/urlInput"
+        android:id="@+id/inputProductImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:hint="Link ảnh sản phẩm (URL)"
-        android:inputType="textUri"
-        android:padding="15dp"
-        android:layout_marginBottom="32dp"
-        android:background="@android:drawable/edit_text"/>
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp"/>
 
     <Button
-        android:id="@+id/saveButton"
+        android:id="@+id/btnSaveProduct"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="LƯU SẢN PHẨM"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:layout_height="55dp"
+        android:text="Lưu Sản Phẩm"
         android:textColor="#FFFFFF"
         android:backgroundTint="#0056b2"
-        android:padding="15dp"
-        android:elevation="4dp"/>
-
+        android:textStyle="bold"/>
 </LinearLayout>
