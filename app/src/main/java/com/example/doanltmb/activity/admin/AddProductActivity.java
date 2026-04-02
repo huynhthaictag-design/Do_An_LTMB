@@ -11,7 +11,6 @@ import com.example.doanltmb.database.DatabaseHelper;
 public class AddProductActivity extends AppCompatActivity {
 
     private EditText nameInput, priceInput, urlInput;
-    private Button saveButton;
     private DatabaseHelper db;
 
     private boolean isEditMode = false;
@@ -24,10 +23,10 @@ public class AddProductActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        nameInput = findViewById(R.id.nameInput);
-        priceInput = findViewById(R.id.priceInput);
-        urlInput = findViewById(R.id.urlInput);
-        saveButton = findViewById(R.id.saveButton);
+        nameInput = findViewById(R.id.inputProductName);
+        priceInput = findViewById(R.id.inputProductPrice);
+        urlInput = findViewById(R.id.inputProductImage);
+        Button saveButton = findViewById(R.id.btnSaveProduct);
 
         // KIỂM TRA CHẾ ĐỘ: THÊM HAY SỬA
         isEditMode = getIntent().getBooleanExtra("IS_EDIT", false);
@@ -68,8 +67,8 @@ public class AddProductActivity extends AppCompatActivity {
                 }
             } else {
                 // Lệnh THÊM MỚI
-                long result = db.addProduct(name, price + "đ", url);
-                if (result != -1) {
+                boolean result = db.addProduct(name, Double.parseDouble(price + "đ"), url);
+                if (!result) {
                     Toast.makeText(this, "Đã thêm sản phẩm mới!", Toast.LENGTH_SHORT).show();
                     finish();
                 }

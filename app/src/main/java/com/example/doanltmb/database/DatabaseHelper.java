@@ -10,6 +10,7 @@ import com.example.doanltmb.model.Product;
 import com.example.doanltmb.utils.HashUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -57,9 +58,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // INSERT SAMPLE USERS
         String sqlUsers = "INSERT INTO users(username,password,role) VALUES " +
-            "('admin','" + adminPass + "','admin'), " +
-            "('tai','" + userPass + "','customer'), " +
-            "('thai','" + userPass + "','customer')";
+                "('admin','" + adminPass + "','admin'), " +
+                "('tai','" + userPass + "','customer'), " +
+                "('thai','" + userPass + "','customer')";
         db.execSQL(sqlUsers);
 
         // INSERT SAMPLE CATEGORIES
@@ -154,10 +155,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // GET PRODUCTS
+    // GET PRODUCTS (Bản dùng double của bạn)
     public boolean addProduct(String name, double price, String imageUrl) {
         SQLiteDatabase db = this.getWritableDatabase();
-        android.content.ContentValues values = new android.content.ContentValues();
+        ContentValues values = new ContentValues();
 
         values.put("product_name", name);
         values.put("price", price);
@@ -172,6 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return result != -1; // Nếu insert thành công result sẽ khác -1
     }
+
     public ArrayList<Product> getAllProductsList() {
 
         ArrayList<Product> list = new ArrayList<>();
@@ -192,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
 
-                list.add(new Product(name, formattedPrice, imageUrl, description));
+            list.add(new Product(name, formattedPrice, imageUrl, description));
         }
 
         cursor.close();
@@ -200,6 +202,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return list;
     }
+
+    public boolean checkUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String hashedInputPassword = HashUtil.hashPassword(password);
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?",
+                new String[]{username, hashedInputPassword});
+
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+
+    // Khi người dùng nhấn vào sản phẩm sẻ lấy id sản phẩm để lấy thông tin sản phẩm
     public Product getProductById(int id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -225,5 +240,85 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return product;
+    }
+
+    public int updateProduct(String oldName, String newName, String newPrice, String newUrl) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("product_name", newName);
+        values.put("price", newPrice);
+        values.put("image_url", newUrl);
+
+        // Dựa vào tên cũ để tìm và cập nhật
+        int result = db.update("products", values, "product_name = ?", new String[]{oldName});
+        db.close();
+        return result;
+    }
+
+    public boolean updateUserProfile(String username, String newFullName, String newPhone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("fullname", newFullName); // Lưu ý: Đảm bảo bảng users có cột này
+        values.put("phone", newPhone);
+
+        // Cập nhật dựa trên username của người đang đăng nhập
+        int result = db.update("users", values, "username = ?", new String[]{username});
+        db.close();
+        return result > 0;
+    }
+    public void deleteProduct(String productName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("products", "product_name = ?", new String[]{productName});
+        db.close();
+    }
+
+    public String getUserRole(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String role = "user";
+
+        Cursor cursor = db.rawQuery("SELECT role FROM users WHERE username = ?", new String[]{username});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            role = cursor.getString(0);
+            cursor.close();
+        }
+
+        return role;
+    }
+    public long addProduct(String name, String price, String imageUrl) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("product_name", name);
+        values.put("price", price);
+        values.put("image_url", imageUrl);
+        values.put("category_id", 1);
+
+        long id = db.insert("products", null, values);
+        db.close();
+        return id;
+    }
+    public List<Product> getAllProducts() {
+        List<Product> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM products", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(1);
+                String price = cursor.getString(3);
+                String imageUrl = cursor.getString(6);
+                String description = cursor.getString(4);
+                if (imageUrl == null) imageUrl = "";
+                if (description == null) description = "Không có thông tin sản phẩm";
+                if (price == null) price = "0";
+                if (name == null) name = "Không có tên sản phẩm";
+
+                list.add(new Product(name, price, imageUrl, description));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return list;
     }
 }
