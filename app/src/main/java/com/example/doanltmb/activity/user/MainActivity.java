@@ -1,7 +1,9 @@
 package com.example.doanltmb.activity.user;
 
-import android.content.Intent;
+import android.content.*;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ProductAdapter adapter;
     private DatabaseHelper dbHelper;
+    private TextView tvUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,26 +31,38 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         loadProducts();
+        loadUserInfo(); // 👈 tách riêng
         setupBottomNavigation();
     }
 
     private void initViews() {
         recyclerView = findViewById(R.id.recyclerViewProducts);
+        tvUsername = findViewById(R.id.tvUsername);
 
-        // Grid 2 cột
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-
         dbHelper = new DatabaseHelper(this);
     }
 
     private void loadProducts() {
-
-        // Lấy dữ liệu từ DB
         List<Product> productList = dbHelper.getAllProductsList();
-
         adapter = new ProductAdapter(this, productList);
-
         recyclerView.setAdapter(adapter);
+    }
+
+    private void loadUserInfo() {
+
+        SharedPreferences prefs = getSharedPreferences("USER_FILE", MODE_PRIVATE);
+        String username = prefs.getString("username", "");
+
+        Cursor cursor = dbHelper.getUser(username);
+
+        if (cursor != null && cursor.moveToFirst()) {
+
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+            tvUsername.setText(name);
+
+            cursor.close();
+        }
     }
 
     private void setupBottomNavigation() {
@@ -60,19 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_home) {
-                return true;
-            }
+            if (itemId == R.id.nav_home) return true;
 
-            if (itemId == R.id.nav_category) {
-                // TODO
-                return true;
-            }
+            if (itemId == R.id.nav_category) return true;
 
-            if (itemId == R.id.nav_favorite) {
-                // TODO
-                return true;
-            }
+            if (itemId == R.id.nav_favorite) return true;
 
             if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));

@@ -40,7 +40,7 @@
             android:name=".activity.user.ProductDetailActivity"
             android:exported="false"/>
         <activity
-            android:name=".activity.EditProfileActivity"
+            android:name=".activity.user.EditProfileActivity"
             android:exported="false"/>
 
     </application>

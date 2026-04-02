@@ -50,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
-
                 finish();
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();

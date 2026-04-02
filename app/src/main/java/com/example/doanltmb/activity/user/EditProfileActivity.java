@@ -1,4 +1,4 @@
-package com.example.doanltmb.activity;
+package com.example.doanltmb.activity.user;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;

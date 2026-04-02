@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7F8"
+    android:background="#FFFFFF"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,16 +15,17 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFF">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="Cửa hàng điện tử"
                 android:textColor="#0056b2"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal"/>
+                android:textStyle="bold" />
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -46,24 +46,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sản phẩm mới nhất"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"/>
+                android:textColor="#333333"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Khám phá công nghệ đỉnh cao"
-                android:textSize="14sp"
-                android:textColor="#666666"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:text="Khám phá công nghệ đỉnh cao"
+                android:textColor="#666666"
+                android:textSize="15sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

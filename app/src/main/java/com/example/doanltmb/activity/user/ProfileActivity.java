@@ -1,25 +1,98 @@
 package com.example.doanltmb.activity.user;
 
 import android.content.Intent;
-import android.media.Image;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.*;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.activity.LoginActivity;
+import com.example.doanltmb.database.DatabaseHelper;
 
 public class ProfileActivity extends AppCompatActivity {
+
     private ImageView btnBack;
+    private TextView tvUsername;
+    private DatabaseHelper db;
+    private LinearLayout btnLogout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trangchu);
+        setContentView(R.layout.activity_profile);
 
+        initViews();
+        setupBackButton();
+        setupLogoutButton();
+        loadUserInfo();
+    }
+
+    private void initViews() {
         btnBack = findViewById(R.id.btnBack);
+        tvUsername = findViewById(R.id.tvUsername);
+        btnLogout = findViewById(R.id.btnLogout);
+        db = new DatabaseHelper(this);
+    }
+
+    private void setupBackButton() {
         btnBack.setOnClickListener(v -> {
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
+    }
+    // HÀM XỬ LÝ ĐĂNG XUẤT
+    private void setupLogoutButton() {
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Xóa toàn bộ dữ liệu trong SharedPreferences "UserPrefs"
+                SharedPreferences sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.clear(); // Lệnh này sẽ xóa sạch username, role, isLoggedIn
+                editor.apply();
 
+                Toast.makeText(ProfileActivity.this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+
+                // 2. Chuyển về màn hình Login
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+
+                // 3. Xóa cờ (Clear Task) để người dùng không bấm nút Back quay lại app được
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(intent);
+                finish(); // Đóng ProfileActivity
+            }
+        });
+    }
+
+    private void loadUserInfo() {
+
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String username = prefs.getString("currentUsername", "");
+
+        Cursor cursor = db.getUser(username);
+
+        if (cursor != null && cursor.moveToFirst()) {
+
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+            tvUsername.setText(name);
+
+            cursor.close();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (db != null) {
+            db.close(); // ✅ đóng DB
+        }
     }
 }

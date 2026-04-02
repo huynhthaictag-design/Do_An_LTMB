@@ -70,18 +70,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Nguyễn Văn A"
                     android:textColor="#333333"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Thành viên Vàng (Gold Member)"
-                    android:textColor="#666666"
-                    android:textSize="14sp" />
 
                 <Button
                     android:layout_width="wrap_content"
@@ -307,11 +298,15 @@
                 app:cardElevation="0dp">
 
                 <LinearLayout
+                    android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFF0F0"
                     android:gravity="center"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <TextView
                         android:layout_width="wrap_content"

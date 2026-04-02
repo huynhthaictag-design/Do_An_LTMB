@@ -321,4 +321,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return list;
     }
+    //Lấy thông tin người dùng dựa trên username
+    public Cursor getUser(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT * FROM users WHERE username=?",
+                new String[]{username}
+        );
+    }
 }
