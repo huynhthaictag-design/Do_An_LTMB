@@ -15,4 +15,8 @@
     <string name="sign_up_to_start_shopping_for_the_latest_electronics">Sign up to start shopping for the latest electronics</string>
     <string name="join_us">Join Us</string>
     <string name="tai_khoan">Tài khoản</string>
+    <string name="c_a_h_ng_i_n_t">Cửa hàng điện tử</string>
+    <string name="timkiemsanpham">Tìm kiếm sản phẩm...</string>
+    <string name="sanphammoinhat">Sản phẩm mới nhất</string>
+    <string name="congnghedinhcao">Khám phá công nghệ đỉnh cao</string>
 </resources>

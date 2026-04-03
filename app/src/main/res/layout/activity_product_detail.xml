@@ -103,15 +103,6 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <!-- ❤️ Nút yêu thích -->
-        <Button
-            android:id="@+id/btnAddFavorite"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:backgroundTint="#0056b2"
-            android:text="❤️"
-            android:textColor="#FFFFFF" />
 
         <!-- 🛒 Nút thêm giỏ hàng -->
         <Button

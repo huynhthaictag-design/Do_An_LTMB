@@ -278,7 +278,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT role FROM users WHERE username = ?", new String[]{username});
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             role = cursor.getString(0);
             cursor.close();
         }
@@ -329,5 +329,82 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "SELECT * FROM users WHERE username=?",
                 new String[]{username}
         );
+    }
+    public ArrayList<Product> searchProducts(String keyword) {
+        ArrayList<Product> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Dùng LIKE và % để tìm kiếm gần đúng (chứa từ khóa là lấy)
+        Cursor cursor = db.rawQuery(
+                "SELECT product_name, price, image_url, description FROM products WHERE product_name LIKE ?",
+                new String[]{"%" + keyword + "%"}
+        );
+
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(0);
+            double price = cursor.getDouble(1);
+            String imageUrl = cursor.getString(2);
+            String description = cursor.getString(3);
+
+            if (imageUrl == null) imageUrl = "";
+
+            String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
+
+            list.add(new Product(name, formattedPrice, imageUrl, description));
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+    // ==========================================
+    // LẤY DANH SÁCH TÊN DANH MỤC TỪ DB
+    // ==========================================
+    public ArrayList<String> getAllCategoryNames() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("Tất cả danh mục"); // Thêm dòng này ở vị trí đầu tiên (index 0)
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT category_name FROM categories", null);
+
+        while (cursor.moveToNext()) {
+            list.add(cursor.getString(0)); // Lấy tên danh mục thêm vào list
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    // ==========================================
+    // LẤY SẢN PHẨM THEO TÊN DANH MỤC
+    // ==========================================
+    public ArrayList<Product> getProductsByCategory(String categoryName) {
+        ArrayList<Product> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Dùng INNER JOIN để đối chiếu category_id giữa 2 bảng
+        String query = "SELECT p.product_name, p.price, p.image_url, p.description " +
+                "FROM products p INNER JOIN categories c ON p.category_id = c.category_id " +
+                "WHERE c.category_name = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{categoryName});
+
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(0);
+            double price = cursor.getDouble(1);
+            String imageUrl = cursor.getString(2);
+            String description = cursor.getString(3);
+
+            if (imageUrl == null) imageUrl = "";
+            String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
+
+            list.add(new Product(name, formattedPrice, imageUrl, description));
+        }
+
+        cursor.close();
+        db.close();
+        return list;
     }
 }
