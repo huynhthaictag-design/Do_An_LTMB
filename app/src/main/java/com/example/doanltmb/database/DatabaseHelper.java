@@ -109,24 +109,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         onCreate(db);
     }
-
-    public boolean checkLogin(String username, String password) {
-
+    public boolean checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
+        String hashedInputPassword = HashUtil.hashPassword(password);
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?",
+                new String[]{username, hashedInputPassword});
 
-        Cursor cursor = db.rawQuery(
-                "SELECT * FROM users WHERE username=? AND password=?",
-                new String[]{username, password}
-        );
-
-        boolean result = cursor.moveToFirst();
-
+        boolean exists = cursor.getCount() > 0;
         cursor.close();
-        db.close();
-
-        return result;
+        return exists;
     }
-
     public boolean registerUser(String username, String password) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -202,18 +194,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return list;
     }
-
-    public boolean checkUser(String username, String password) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String hashedInputPassword = HashUtil.hashPassword(password);
-        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?",
-                new String[]{username, hashedInputPassword});
-
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        return exists;
-    }
-
     // Khi người dùng nhấn vào sản phẩm sẻ lấy id sản phẩm để lấy thông tin sản phẩm
     public Product getProductById(int id) {
 
@@ -330,37 +310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{username}
         );
     }
-    public ArrayList<Product> searchProducts(String keyword) {
-        ArrayList<Product> list = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Dùng LIKE và % để tìm kiếm gần đúng (chứa từ khóa là lấy)
-        Cursor cursor = db.rawQuery(
-                "SELECT product_name, price, image_url, description FROM products WHERE product_name LIKE ?",
-                new String[]{"%" + keyword + "%"}
-        );
-
-        while (cursor.moveToNext()) {
-            String name = cursor.getString(0);
-            double price = cursor.getDouble(1);
-            String imageUrl = cursor.getString(2);
-            String description = cursor.getString(3);
-
-            if (imageUrl == null) imageUrl = "";
-
-            String formattedPrice = String.format("%,.0fđ", price).replace(",", ".");
-
-            list.add(new Product(name, formattedPrice, imageUrl, description));
-        }
-
-        cursor.close();
-        db.close();
-
-        return list;
-    }
-    // ==========================================
     // LẤY DANH SÁCH TÊN DANH MỤC TỪ DB
-    // ==========================================
     public ArrayList<String> getAllCategoryNames() {
         ArrayList<String> list = new ArrayList<>();
         list.add("Tất cả danh mục"); // Thêm dòng này ở vị trí đầu tiên (index 0)
@@ -376,10 +326,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
-
-    // ==========================================
     // LẤY SẢN PHẨM THEO TÊN DANH MỤC
-    // ==========================================
     public ArrayList<Product> getProductsByCategory(String categoryName) {
         ArrayList<Product> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();

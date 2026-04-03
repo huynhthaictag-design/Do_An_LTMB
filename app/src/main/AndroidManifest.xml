@@ -13,6 +13,12 @@
         android:theme="@style/Theme.DoAnLTMB">
 
         <activity
+            android:name=".activity.user.CartActivity"
+            android:exported="false"
+            android:label="@string/title_activity_cart"
+            android:theme="@style/Theme.DoAnLTMB" />
+
+        <activity
             android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -23,26 +29,23 @@
 
         <activity
             android:name=".activity.RegisterActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".activity.user.MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="false"/>
-
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.user.ProfileActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".activity.admin.AddProductActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.user.ProductDetailActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.user.EditProfileActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
     </application>
+
 </manifest>

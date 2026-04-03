@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavigation();
         setupSearch();
         setupFilter();
+        onResume();
     }
 
     private void initViews() {
@@ -79,10 +80,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+        bottomNav.setSelectedItemId(R.id.nav_home);
 
-    // ==========================================
-    // HÀM TÌM KIẾM ĐÃ ĐƯỢC TỐI ƯU
-    // ==========================================
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) return true;
+            if (itemId == R.id.nav_notification) return true;
+            if (itemId == R.id.nav_cart){
+                startActivity(new Intent(MainActivity.this, CartActivity.class));
+                return true;
+            }
+            if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                return true;
+            }
+            return false;
+        });
+    }
     private void setupSearch() {
         if (edtSearch == null) return;
 
@@ -100,27 +116,7 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
     }
-
-    private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_home);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) return true;
-            if (itemId == R.id.nav_notification) return true;
-            if (itemId == R.id.nav_shopping_cart) return true;
-            if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                return true;
-            }
-            return false;
-        });
-    }
-
-    // ==========================================
     // HÀM HIỂN THỊ HỘP THOẠI LỌC KẾT HỢP
-    // ==========================================
     private void setupFilter() {
         if (btnFilter == null) return;
 
@@ -169,10 +165,6 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         });
     }
-
-    // ==========================================
-    // HÀM LỌC TỔNG HỢP: DANH MỤC -> TÌM KIẾM -> GIÁ
-    // ==========================================
     private void applyCombinedFilters() {
         // 1. Lọc theo Danh mục
         List<Product> currentList;
@@ -222,5 +214,17 @@ public class MainActivity extends AppCompatActivity {
         // 4. Cập nhật kết quả lên màn hình
         adapter = new ProductAdapter(MainActivity.this, finalFilteredList);
         recyclerView.setAdapter(adapter);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+        if (bottomNav != null) {
+            // LƯU Ý: Đảm bảo "nav_main" đúng với ID ở file bottom_nav_menu.xml
+            android.view.MenuItem item = bottomNav.getMenu().findItem(R.id.nav_home);
+            if (item != null) {
+                item.setChecked(true);
+            }
+        }
     }
 }

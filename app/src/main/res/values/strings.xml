@@ -19,4 +19,5 @@
     <string name="timkiemsanpham">Tìm kiếm sản phẩm...</string>
     <string name="sanphammoinhat">Sản phẩm mới nhất</string>
     <string name="congnghedinhcao">Khám phá công nghệ đỉnh cao</string>
+    <string name="title_activity_cart">CartActivity</string>
 </resources>
