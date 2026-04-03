@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.doanltmb.R;
-import com.example.doanltmb.activity.user.ProductDetailActivity;
+import com.example.doanltmb.activity.product.ProductDetailActivity;
 import com.example.doanltmb.model.Product;
 
 import java.util.List;

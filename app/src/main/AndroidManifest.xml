@@ -13,7 +13,7 @@
         android:theme="@style/Theme.DoAnLTMB">
 
         <activity
-            android:name=".activity.user.CartActivity"
+            android:name=".activity.product.CartActivity"
             android:exported="false"
             android:label="@string/title_activity_cart"
             android:theme="@style/Theme.DoAnLTMB" />
@@ -41,7 +41,7 @@
             android:name=".activity.admin.AddProductActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.user.ProductDetailActivity"
+            android:name=".activity.product.ProductDetailActivity"
             android:exported="false" />
         <activity
             android:name=".activity.user.EditProfileActivity"

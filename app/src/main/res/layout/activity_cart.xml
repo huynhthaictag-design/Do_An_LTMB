@@ -60,53 +60,12 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:background="#E6F0FA"
-                        android:scaleType="centerCrop" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        android:layout_marginStart="12dp">
-
-                        <TextView
-                            android:id="@+id/tvName1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxLines="1"
-                            android:text="Sản phẩm mẫu"
-                            android:textColor="#333333"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:text="2.450.000đ"
-                            android:textColor="#0056b2"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                    </RelativeLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="16dp" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -136,10 +95,11 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvTotalPrice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="2.450.000đ"
+                            android:text="0đ"
                             android:textColor="#0056b2"
                             android:textSize="22sp"
                             android:textStyle="bold" />

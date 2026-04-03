@@ -1,5 +1,6 @@
-package com.example.doanltmb.activity.user;
+package com.example.doanltmb.activity.product;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.*;
 
@@ -9,9 +10,12 @@ import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.Product;
 
+import java.text.BreakIterator;
+
 public class ProductDetailActivity extends AppCompatActivity {
 
     ImageView img, btnBack;
+    Button btnAddToCart;
     TextView name, price, desc;
 
 
@@ -25,6 +29,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         price = findViewById(R.id.tvPrice);
         desc = findViewById(R.id.tvDescription);
         btnBack = findViewById(R.id.btnBack);
+        btnAddToCart = findViewById(R.id.btnAddToCart);
 
         int productId = getIntent().getIntExtra("product_id", -1);
 
@@ -49,6 +54,27 @@ public class ProductDetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> {
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        });
+        btnAddToCart.setOnClickListener(v -> {
+            // 1. Lấy username của người dùng đang đăng nhập (giống cách làm ở CartActivity)
+            SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String currentUsername = sharedPreferences.getString("currentUsername", "tai");
+
+            // 2. Lấy tên sản phẩm mà người dùng đang xem
+            // (Nếu bạn đang gán tên SP lên TextView thì dùng getText(), hoặc lấy từ Intent)
+            String productName = name.getText().toString();
+
+            // 3. Gọi hàm thêm vào Database mà chúng ta đã viết trong DatabaseHelper
+            boolean isSuccess = db.addToCart(currentUsername, productName);
+
+            // 4. Kiểm tra kết quả và hiển thị thông báo
+            if (isSuccess) {
+                // Nếu thành công (isSuccess == true)
+                Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Nếu thất bại (isSuccess == false)
+                Toast.makeText(ProductDetailActivity.this, "Lỗi! Không thể thêm vào giỏ hàng.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

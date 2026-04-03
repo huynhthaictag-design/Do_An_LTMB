@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.*;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.activity.product.CartActivity;
 import com.example.doanltmb.adapter.ProductAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.Product;
