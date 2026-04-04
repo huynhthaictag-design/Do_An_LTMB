@@ -26,8 +26,20 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
 
+        // Kiểm tra trạng thái ngay lập tức
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+
+        if (!isLoggedIn) {
+            // Nếu chưa đăng nhập mà lỡ vào đây -> Đẩy về Login ngay
+            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Kết thúc Activity này để không bấm Back quay lại được
+            return;
+        }
+
+        setContentView(R.layout.activity_profile);
         initViews();
         setupBackButton();
         setupLogoutButton();

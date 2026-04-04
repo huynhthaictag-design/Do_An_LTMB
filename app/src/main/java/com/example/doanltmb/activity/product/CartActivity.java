@@ -20,6 +20,9 @@ import com.example.doanltmb.activity.user.ProfileActivity;
 import com.example.doanltmb.adapter.CartAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.CartItem;
+// --- IMPORT MỚI ---
+import com.example.doanltmb.utils.NotificationHelper;
+// ------------------
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -31,7 +34,6 @@ public class CartActivity extends AppCompatActivity {
     private Button btnCheckout;
     private BottomNavigationView bottomNav;
 
-    // --- CÁC BIẾN CHO GIỎ HÀNG ---
     private RecyclerView recyclerViewCart;
     private TextView tvTotalPrice;
     private CartAdapter cartAdapter;
@@ -54,29 +56,24 @@ public class CartActivity extends AppCompatActivity {
         btnCheckout = findViewById(R.id.btnCheckout);
         bottomNav = findViewById(R.id.bottomNavigation);
 
-        // Khởi tạo các View của Giỏ hàng
         recyclerViewCart = findViewById(R.id.recyclerViewCart);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
 
         dbHelper = new DatabaseHelper(this);
         cartItemList = new ArrayList<>();
 
-        // Cài đặt RecyclerView để vẽ danh sách
         recyclerViewCart.setLayoutManager(new LinearLayoutManager(this));
         cartAdapter = new CartAdapter(this, cartItemList, new CartAdapter.CartUpdateListener() {
             @Override
             public void onCartUpdated() {
-                // Mỗi khi Adapter báo là có bấm cộng/trừ, ta load lại Giỏ hàng để tính tổng tiền
                 loadCartData();
             }
         });
         recyclerViewCart.setAdapter(cartAdapter);
 
-        // Lấy username đang đăng nhập để biết giỏ hàng của ai (Mặc định lấy "tai" nếu chưa đăng nhập)
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         currentUsername = sharedPreferences.getString("currentUsername", "tai");
 
-        // Gọi hàm tải dữ liệu
         loadCartData();
     }
 
@@ -84,7 +81,6 @@ public class CartActivity extends AppCompatActivity {
         cartItemList.clear();
         double totalPrice = 0;
 
-        // Gọi DatabaseHelper để lấy giỏ hàng
         Cursor cursor = dbHelper.getCartItems(currentUsername);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -95,20 +91,15 @@ public class CartActivity extends AppCompatActivity {
                 String imageUrl = cursor.getString(3);
                 int quantity = cursor.getInt(4);
 
-                // Thêm vào danh sách
                 cartItemList.add(new CartItem(cartId, name, price, imageUrl, quantity));
-
-                // Cộng dồn tiền
                 totalPrice += (price * quantity);
 
             } while (cursor.moveToNext());
             cursor.close();
         }
 
-        // Cập nhật lên màn hình
         cartAdapter.notifyDataSetChanged();
 
-        // In số tiền ra dạng có dấu chấm (Ví dụ: 2.500.000đ)
         String formattedTotal = String.format("%,.0fđ", totalPrice).replace(",", ".");
         if (tvTotalPrice != null) {
             tvTotalPrice.setText(formattedTotal);
@@ -122,18 +113,23 @@ public class CartActivity extends AppCompatActivity {
 
         if (btnCheckout != null) {
             btnCheckout.setOnClickListener(v -> {
-                // Kiểm tra xem giỏ hàng có trống không
                 if (cartItemList == null || cartItemList.isEmpty()) {
                     Toast.makeText(CartActivity.this, "Giỏ hàng của bạn đang trống!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Gọi hàm thanh toán
                 boolean isSuccess = dbHelper.checkoutCart(currentUsername);
 
                 if (isSuccess) {
+                    // --- THÊM LOGIC THÔNG BÁO CHO ADMIN ---
+                    NotificationHelper.sendNotification(
+                            CartActivity.this,
+                            "Đơn hàng mới!",
+                            "Thịnh Admin ơi, người dùng " + currentUsername + " vừa đặt hàng kìa!"
+                    );
+                    // --------------------------------------
+
                     Toast.makeText(CartActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
-                    // Load lại dữ liệu (lúc này giỏ hàng đã bị xóa nên danh sách sẽ trống rỗng và tiền về 0)
                     loadCartData();
                 } else {
                     Toast.makeText(CartActivity.this, "Có lỗi xảy ra, vui lòng thử lại!", Toast.LENGTH_SHORT).show();

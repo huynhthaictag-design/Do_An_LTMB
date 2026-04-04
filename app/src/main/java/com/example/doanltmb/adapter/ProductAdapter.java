@@ -7,18 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.example.doanltmb.model.Product;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.product.ProductDetailActivity;
-import com.example.doanltmb.model.Product;
-
+import com.example.doanltmb.model.Product; // Import lớp Product từ model
 import java.util.List;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
-
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private Context context;
     private List<Product> list;
 
@@ -29,60 +26,39 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context)
-                .inflate(R.layout.item_product, parent, false);
-        return new ViewHolder(view);
+    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context).inflate(R.layout.item_product, parent, false);
+        return new ProductViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product p = list.get(position);
+        holder.tvName.setText(p.getName());
+        holder.tvPrice.setText(p.getPrice());
 
-        // set tên + giá
-        holder.txtName.setText(p.getName());
-        holder.txtPrice.setText(p.getPrice());
+        // Tìm ảnh trong drawable theo tên lưu trong Database
+        int resId = context.getResources().getIdentifier(p.getImageUrl(), "drawable", context.getPackageName());
+        holder.imgProduct.setImageResource(resId != 0 ? resId : R.drawable.ic_launcher_background);
 
-        // set ảnh từ drawable
-        String imageName = p.getImageUrl(); // ví dụ: iphone13
-
-        int resId = context.getResources().getIdentifier(
-                imageName,
-                "drawable",
-                context.getPackageName()
-        );
-
-        if (resId != 0) {
-            holder.img.setImageResource(resId);
-        } else {
-            // ảnh mặc định nếu sai tên
-            holder.img.setImageResource(R.drawable.ic_launcher_background);
-        }
+        // Bấm vào để xem chi tiết sản phẩm
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProductDetailActivity.class);
-            intent.putExtra("product_id", position + 1); // hoặc id thật nếu có
+            intent.putExtra("product_id", p.getId());
             context.startActivity(intent);
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
+    @Override public int getItemCount() { return list.size(); }
 
-    // ViewHolder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView img;
-        TextView txtName, txtPrice;
-
-        public ViewHolder(@NonNull View itemView) {
+    public static class ProductViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName, tvPrice;
+        ImageView imgProduct;
+        public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            img = itemView.findViewById(R.id.imageProduct);
-            txtName = itemView.findViewById(R.id.textProductName);
-            txtPrice = itemView.findViewById(R.id.textProductPrice);
+            tvName = itemView.findViewById(R.id.textProductName);
+            tvPrice = itemView.findViewById(R.id.textProductPrice);
+            imgProduct = itemView.findViewById(R.id.imageProduct);
         }
     }
 }

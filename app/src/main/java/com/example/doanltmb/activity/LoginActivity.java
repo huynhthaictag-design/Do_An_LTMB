@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.activity.admin.AdminMainActivity;
 import com.example.doanltmb.activity.user.MainActivity;
 import com.example.doanltmb.database.DatabaseHelper;
 
@@ -32,27 +33,43 @@ public class LoginActivity extends AppCompatActivity {
             String user = emailInput.getText().toString().trim();
             String pass = passwordInput.getText().toString().trim();
 
+            if (user.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(this, "Thịnh ơi, đừng để trống tài khoản mật khẩu nhé!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 1. Kiểm tra đăng nhập
             if (db.checkUser(user, pass)) {
-                // LẤY VAI TRÒ (ROLE) TỪ DATABASE
+
+                // 2. Lấy vai trò (Role) của User này từ Database
                 String role = db.getUserRole(user);
 
+                // 3. Lưu trạng thái đăng nhập vào SharedPreferences
                 SharedPreferences sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("isLoggedIn", true);
                 editor.putString("currentUsername", user);
-                editor.putString("userRole", role); // Lưu 'admin' hoặc 'user'
+                editor.putString("userRole", role); // Lưu 'admin' hoặc 'customer'
                 editor.apply();
 
-                Toast.makeText(this, "Đăng nhập thành công với quyền " + role, Toast.LENGTH_SHORT).show();
-                //Mở màn hình chính
-                if (role.equals("admin")) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                Toast.makeText(this, "Đăng nhập thành công: " + role, Toast.LENGTH_SHORT).show();
+
+                // 4. PHÂN LUỒNG MÀN HÌNH CHÍNH
+                if (role != null && role.equalsIgnoreCase("admin")) {
+                    // Nếu là Admin -> Vào màn hình quản trị của Thịnh
+                    Intent intent = new Intent(LoginActivity.this, AdminMainActivity.class);
+                    startActivity(intent);
                 } else {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    // Nếu là User -> Vào màn hình chính của bạn Thịnh
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
                 }
+
+                // Đóng màn hình Login sau khi đăng nhập thành công
                 finish();
+
             } else {
-                Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sai tài khoản hoặc mật khẩu rồi!", Toast.LENGTH_SHORT).show();
             }
         });
     }

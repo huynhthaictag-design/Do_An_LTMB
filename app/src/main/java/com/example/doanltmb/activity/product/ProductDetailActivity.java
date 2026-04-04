@@ -3,14 +3,11 @@ package com.example.doanltmb.activity.product;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.*;
-
+import com.example.doanltmb.model.Product;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
-import com.example.doanltmb.model.Product;
-
-import java.text.BreakIterator;
 
 public class ProductDetailActivity extends AppCompatActivity {
 

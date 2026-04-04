@@ -9,12 +9,12 @@ import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.*;
-
+import com.example.doanltmb.model.Product;
+import com.example.doanltmb.adapter.ProductAdapter;
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.product.CartActivity;
-import com.example.doanltmb.adapter.ProductAdapter;
+import com.example.doanltmb.activity.LoginActivity;
 import com.example.doanltmb.database.DatabaseHelper;
-import com.example.doanltmb.model.Product;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -87,14 +87,35 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+
+            // Lấy trạng thái đăng nhập từ SharedPreferences
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+
             if (itemId == R.id.nav_home) return true;
             if (itemId == R.id.nav_notification) return true;
+
             if (itemId == R.id.nav_cart){
-                startActivity(new Intent(MainActivity.this, CartActivity.class));
+                // Chặn giỏ hàng nếu chưa đăng nhập
+                if (!isLoggedIn) {
+                    Toast.makeText(this, "Vui lòng đăng nhập để xem giỏ hàng!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    startActivity(new Intent(MainActivity.this, CartActivity.class));
+                }
                 return true;
             }
+
             if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                // KIỂM TRA ĐĂNG NHẬP Ở ĐÂY
+                if (!isLoggedIn) {
+                    // Nếu chưa đăng nhập -> Chuyển sang trang Login
+                    Toast.makeText(this, "Vui lòng đăng nhập để xem tài khoản!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    // Nếu đã đăng nhập -> Cho phép vào trang Profile
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                }
                 return true;
             }
             return false;
