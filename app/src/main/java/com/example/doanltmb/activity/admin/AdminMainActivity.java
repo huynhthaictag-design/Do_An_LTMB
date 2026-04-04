@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
+
 import com.example.doanltmb.model.Product;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -38,9 +39,6 @@ public class AdminMainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNavigation);
         FloatingActionButton btnAdd = findViewById(R.id.btnAddNewProduct);
 
-        // Ánh xạ nút (Bây giờ sẽ hết lỗi vì đã thêm vào XML ở Bước 1)
-        btnOrderList = findViewById(R.id.btnOrderList);
-
         rvAdminProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
         loadData();
@@ -48,13 +46,6 @@ public class AdminMainActivity extends AppCompatActivity {
 
         // Sự kiện nút thêm sản phẩm
         btnAdd.setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
-
-        // Sự kiện bấm vào icon để xem danh sách đơn hàng
-        if (btnOrderList != null) {
-            btnOrderList.setOnClickListener(v -> {
-                startActivity(new Intent(AdminMainActivity.this, AdminOrderActivity.class));
-            });
-        }
 
         // Tìm kiếm sản phẩm
         edtSearch.addTextChangedListener(new TextWatcher() {
@@ -71,14 +62,23 @@ public class AdminMainActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_home);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+
             if (itemId == R.id.nav_home) return true;
+
+            if (itemId == R.id.nav_notification) {
+                startActivity(new Intent(AdminMainActivity.this, AdminOrderActivity.class));
+                return true;
+            }
+
             if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(AdminMainActivity.this, ProfileActivity.class));
                 return true;
             }
+
             return false;
         });
     }
+
 
     private void loadData() {
         fullList = db.getAllProductsList();

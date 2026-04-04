@@ -8,20 +8,42 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DoAnLTMB">
 
-        <activity android:name=".activity.user.MainActivity" android:exported="true">
+        <activity android:name=".activity.LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.admin.AdminMainActivity" android:exported="false" />
-        <activity android:name=".activity.admin.AddProductActivity" android:exported="false" />
-        <activity android:name=".activity.LoginActivity" android:exported="false" />
-        <activity android:name=".activity.RegisterActivity" android:exported="false" />
-        <activity android:name=".activity.user.ProfileActivity" android:exported="false" />
-        <activity android:name=".activity.product.CartActivity" android:exported="false" />
-        <activity android:name=".activity.product.ProductDetailActivity" android:exported="false" />
-        <activity android:name=".activity.user.EditProfileActivity" android:exported="false" />
+        <activity android:name=".activity.RegisterActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.admin.AdminMainActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.admin.AddProductActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.user.MainActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.user.ProfileActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.product.CartActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.product.ProductDetailActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.user.EditProfileActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.admin.AdminOrderActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.admin.AdminOrderDetailActivity"
+            android:exported="false" />
+
     </application>
 </manifest>

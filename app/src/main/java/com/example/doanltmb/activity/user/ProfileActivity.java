@@ -52,12 +52,8 @@ public class ProfileActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         db = new DatabaseHelper(this);
     }
-
     private void setupBackButton() {
-        btnBack.setOnClickListener(v -> {
-            finish();
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        });
+        btnBack.setOnClickListener(v -> finish());
     }
     // HÀM XỬ LÝ ĐĂNG XUẤT
     private void setupLogoutButton() {

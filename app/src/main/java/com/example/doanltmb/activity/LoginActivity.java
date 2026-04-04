@@ -3,9 +3,7 @@ package com.example.doanltmb.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
@@ -17,6 +15,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginButton;
+    private TextView registerText;
     private DatabaseHelper db;
 
     @Override
@@ -28,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
+        registerText = findViewById(R.id.registerText);
 
         loginButton.setOnClickListener(v -> {
             String user = emailInput.getText().toString().trim();
@@ -71,6 +71,10 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu rồi!", Toast.LENGTH_SHORT).show();
             }
+        });
+        registerText.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 }
