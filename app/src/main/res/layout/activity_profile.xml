@@ -7,14 +7,14 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7F8"
+    android:background="#F8F9FA"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white"
+        android:background="#F8F9FA"
         android:paddingHorizontal="16dp">
 
         <TextView
@@ -105,8 +105,12 @@
                 app:cardElevation="0dp">
 
                 <LinearLayout
+                    android:id="@+id/btnPurchaseHistory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:padding="16dp">
 

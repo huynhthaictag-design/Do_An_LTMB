@@ -30,6 +30,12 @@
         <activity android:name=".activity.user.ProfileActivity"
             android:exported="false" />
 
+        <activity android:name=".activity.user.UserNotificationActivity"
+            android:exported="false" />
+
+        <activity android:name=".activity.user.PurchaseHistoryActivity"
+            android:exported="false" />
+
         <activity android:name=".activity.product.CartActivity"
             android:exported="false" />
 

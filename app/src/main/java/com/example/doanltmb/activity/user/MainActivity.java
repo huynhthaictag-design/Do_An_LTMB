@@ -93,7 +93,15 @@ public class MainActivity extends AppCompatActivity {
             boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
 
             if (itemId == R.id.nav_home) return true;
-            if (itemId == R.id.nav_notification) return true;
+            if (itemId == R.id.nav_notification) {
+                if (!isLoggedIn) {
+                    Toast.makeText(this, "Vui lòng đăng nhập để xem thông báo!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    startActivity(new Intent(MainActivity.this, UserNotificationActivity.class));
+                }
+                return true;
+            }
 
             if (itemId == R.id.nav_cart){
                 // Chặn giỏ hàng nếu chưa đăng nhập

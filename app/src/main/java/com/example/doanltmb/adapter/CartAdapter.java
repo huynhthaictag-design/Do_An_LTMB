@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.CartItem;
+import com.example.doanltmb.utils.ImageLoader;
 
 import java.util.List;
 
@@ -51,12 +52,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         String formattedPrice = String.format("%,.0fđ", item.getPrice()).replace(",", ".");
         holder.tvPrice.setText(formattedPrice);
 
-        int imageResId = context.getResources().getIdentifier(item.getImageUrl(), "drawable", context.getPackageName());
-        if (imageResId != 0) {
-            holder.imgProduct.setImageResource(imageResId);
-        } else {
-            holder.imgProduct.setImageResource(R.mipmap.ic_launcher);
-        }
+        ImageLoader.loadProductImage(context, holder.imgProduct, item.getImageUrl());
 
         // BẮT SỰ KIỆN NÚT CỘNG
         holder.btnPlus.setOnClickListener(v -> {

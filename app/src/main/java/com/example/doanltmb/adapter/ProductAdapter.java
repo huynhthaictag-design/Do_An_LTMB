@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.product.ProductDetailActivity;
 import com.example.doanltmb.model.Product; // Import lớp Product từ model
+import com.example.doanltmb.utils.ImageLoader;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
@@ -38,8 +39,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvPrice.setText(p.getPrice());
 
         // Tìm ảnh trong drawable theo tên lưu trong Database
-        int resId = context.getResources().getIdentifier(p.getImageUrl(), "drawable", context.getPackageName());
-        holder.imgProduct.setImageResource(resId != 0 ? resId : R.drawable.ic_launcher_background);
+        ImageLoader.loadProductImage(context, holder.imgProduct, p.getImageUrl());
 
         // Bấm vào để xem chi tiết sản phẩm
         holder.itemView.setOnClickListener(v -> {

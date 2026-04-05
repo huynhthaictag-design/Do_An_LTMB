@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.user.MainActivity;
 import com.example.doanltmb.activity.user.ProfileActivity;
+import com.example.doanltmb.activity.user.UserNotificationActivity;
 import com.example.doanltmb.adapter.CartAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.CartItem;
@@ -131,11 +132,26 @@ public class CartActivity extends AppCompatActivity {
 
                     Toast.makeText(CartActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
                     loadCartData();
+                    showBottomNavIfHidden();
                 } else {
                     Toast.makeText(CartActivity.this, "Có lỗi xảy ra, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                 }
             });
         }
+    }
+
+    // Hien lai bottom navigation neu no dang bi an sau khi user thao tac xong.
+    private void showBottomNavIfHidden() {
+        if (bottomNav == null) return;
+
+        bottomNav.post(() -> {
+            if (bottomNav.getTranslationY() > 0f) {
+                bottomNav.animate()
+                        .translationY(0f)
+                        .setDuration(200)
+                        .start();
+            }
+        });
     }
 
     private void setupBottomNavigation() {
@@ -165,6 +181,11 @@ public class CartActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (itemId == R.id.nav_notification) {
+                startActivity(new Intent(CartActivity.this, UserNotificationActivity.class));
+                return true;
+            }
+
             if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(CartActivity.this, ProfileActivity.class));
                 return false;
@@ -184,5 +205,6 @@ public class CartActivity extends AppCompatActivity {
                 item.setChecked(true);
             }
         }
+        showBottomNavIfHidden();
     }
 }

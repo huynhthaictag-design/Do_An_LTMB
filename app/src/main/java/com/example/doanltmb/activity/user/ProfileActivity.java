@@ -22,6 +22,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUsername;
     private DatabaseHelper db;
     private LinearLayout btnLogout;
+    private LinearLayout btnPurchaseHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         initViews();
         setupBackButton();
+        setupPurchaseHistoryButton();
         setupLogoutButton();
         loadUserInfo();
     }
@@ -50,12 +52,21 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         tvUsername = findViewById(R.id.tvUsername);
         btnLogout = findViewById(R.id.btnLogout);
+        btnPurchaseHistory = findViewById(R.id.btnPurchaseHistory);
         db = new DatabaseHelper(this);
     }
     private void setupBackButton() {
         btnBack.setOnClickListener(v -> finish());
     }
     // HÀM XỬ LÝ ĐĂNG XUẤT
+    // Mo man lich su mua hang de user xem cac don da duoc duyet.
+    private void setupPurchaseHistoryButton() {
+        if (btnPurchaseHistory != null) {
+            btnPurchaseHistory.setOnClickListener(v ->
+                    startActivity(new Intent(ProfileActivity.this, PurchaseHistoryActivity.class)));
+        }
+    }
+    // Ham xu ly dang xuat va xoa trang thai dang nhap hien tai.
     private void setupLogoutButton() {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override

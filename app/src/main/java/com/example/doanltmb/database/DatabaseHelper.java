@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "store.db";
     // Tăng lên 17 để nạp lại toàn bộ dữ liệu ảnh mới từ drawable
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 19;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,9 +22,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, role TEXT, phone TEXT)");
         db.execSQL("CREATE TABLE categories (category_id INTEGER PRIMARY KEY AUTOINCREMENT, category_name TEXT)");
-        db.execSQL("CREATE TABLE products (product_id INTEGER PRIMARY KEY AUTOINCREMENT, product_name TEXT, description TEXT, price REAL, image_url TEXT, category_id INTEGER)");
+        db.execSQL("CREATE TABLE products (product_id INTEGER PRIMARY KEY AUTOINCREMENT, product_name TEXT, description TEXT, price REAL, image_url TEXT, category_id INTEGER, quantity INTEGER DEFAULT 0)");
         db.execSQL("CREATE TABLE cart (cart_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, product_name TEXT, quantity INTEGER)");
-        db.execSQL("CREATE TABLE orders (order_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, product_name TEXT, quantity INTEGER, price REAL, status TEXT DEFAULT 'Pending', order_date DATETIME DEFAULT CURRENT_TIMESTAMP)");
+        db.execSQL("CREATE TABLE orders (order_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, product_name TEXT, quantity INTEGER, price REAL, status TEXT DEFAULT 'Pending', order_date DATETIME DEFAULT CURRENT_TIMESTAMP, is_hidden INTEGER DEFAULT 0)");
         insertSampleData(db);
     }
 
@@ -47,6 +47,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int old, int next) {
+        if (old < 19) {
+            if (old < 18) {
+                db.execSQL("ALTER TABLE orders ADD COLUMN is_hidden INTEGER DEFAULT 0");
+            }
+
+            db.execSQL("ALTER TABLE products ADD COLUMN quantity INTEGER DEFAULT 0");
+            return;
+        }
+
         db.execSQL("DROP TABLE IF EXISTS users");
         db.execSQL("DROP TABLE IF EXISTS products");
         db.execSQL("DROP TABLE IF EXISTS cart");
@@ -89,6 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ===========================================================
     // 2. QUẢN LÝ SẢN PHẨM & LỌC (ADMIN + USER)
     // ===========================================================
+    // Lay danh sach ten danh muc de hien thi cho bo loc va form admin.
     public ArrayList<String> getAllCategoryNames() {
         ArrayList<String> list = new ArrayList<>();
         list.add("Tất cả danh mục");
@@ -127,23 +137,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public boolean addProduct(String name, double price, String url) {
+    // Them san pham moi tu form admin voi day du thong tin co the luu duoc.
+    public boolean addProduct(String name, double price, String url, String description, String categoryName, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
-        v.put("product_name", name); v.put("price", price); v.put("image_url", url); v.put("category_id", 1);
+        v.put("product_name", name);
+        v.put("price", price);
+        v.put("image_url", url);
+        v.put("description", description);
+        v.put("category_id", getCategoryIdByName(categoryName));
+        v.put("quantity", quantity);
         return db.insert("products", null, v) != -1;
     }
 
-    public int updateProduct(String old, String name, String price, String url) {
+    // Cap nhat san pham hien co theo du lieu moi trong form admin.
+    public int updateProduct(String old, String name, double price, String url, String description, String categoryName, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
-        String p = price.replaceAll("[^0-9]", "");
-        v.put("product_name", name); v.put("price", Double.parseDouble(p)); v.put("image_url", url);
+        v.put("product_name", name);
+        v.put("price", price);
+        v.put("image_url", url);
+        v.put("description", description);
+        v.put("category_id", getCategoryIdByName(categoryName));
+        v.put("quantity", quantity);
         return db.update("products", v, "product_name = ?", new String[]{old});
+    }
+
+    // Lay chi tiet san pham de do du lieu len form sua trong man admin.
+    public Cursor getProductForEdit(String productName) {
+        return this.getReadableDatabase().rawQuery(
+                "SELECT p.product_name, p.description, p.price, p.image_url, p.quantity, c.category_name " +
+                        "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.product_name = ?",
+                new String[]{productName}
+        );
     }
 
     public void deleteProduct(String name) {
         this.getWritableDatabase().delete("products", "product_name = ?", new String[]{name});
+    }
+
+    // Tim category_id theo ten danh muc de luu dung khoa ngoai cho san pham.
+    private int getCategoryIdByName(String categoryName) {
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT category_id FROM categories WHERE category_name = ?",
+                new String[]{categoryName}
+        );
+        try {
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+        } finally {
+            c.close();
+        }
+        return 1;
     }
 
     // ===========================================================
@@ -189,7 +235,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getAllOrders() {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM orders ORDER BY order_id DESC", null);
+        return this.getReadableDatabase().rawQuery(
+                "SELECT * FROM orders WHERE status = 'Pending' ORDER BY order_id DESC", null);
+    }
+
+    // Lay danh sach thong bao don hang da duoc cap nhat cho user hien tai.
+    public Cursor getUserNotifications(String username) {
+        return this.getReadableDatabase().rawQuery(
+                "SELECT * FROM orders WHERE username = ? AND status != 'Pending' AND is_hidden = 0 ORDER BY order_id DESC",
+                new String[]{username});
+    }
+
+    // Danh dau thong bao da bi an thay vi xoa han don hang khoi database.
+    public boolean hideUserNotification(int orderId, String username) {
+        ContentValues v = new ContentValues();
+        v.put("is_hidden", 1);
+        return this.getWritableDatabase().update(
+                "orders",
+                v,
+                "order_id = ? AND username = ?",
+                new String[]{String.valueOf(orderId), username}
+        ) > 0;
+    }
+
+    // Lay lich su mua hang da duoc duyet cua user de hien thi trong trang ho so.
+    public Cursor getUserPurchaseHistory(String username) {
+        return this.getReadableDatabase().rawQuery(
+                "SELECT product_name, quantity, price, order_date FROM orders WHERE username = ? AND status = 'Approved' ORDER BY order_date DESC",
+                new String[]{username});
     }
 
     public Cursor getOrderById(int id) {
@@ -198,6 +271,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean updateOrderStatus(int id, String s) {
         ContentValues v = new ContentValues(); v.put("status", s);
-        return this.getWritableDatabase().update("orders", v, "order_id = ?", new String[]{String.valueOf(id)}) > 0;
+        return this.getWritableDatabase().update("orders", v, "order_id = ?",
+                new String[]{String.valueOf(id)}) > 0;
     }
 }

@@ -2,8 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.DoAnLTMB" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+        <item name="android:windowLightStatusBar">true</item>    </style>
 
     <style name="Theme.DoAnLTMB" parent="Base.Theme.DoAnLTMB" />
 </resources>

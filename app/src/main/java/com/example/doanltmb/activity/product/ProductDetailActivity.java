@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.utils.ImageLoader;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -38,15 +39,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             price.setText(p.getPrice());
             desc.setText(p.getDescription());
 
-            int resId = getResources().getIdentifier(
-                    p.getImageUrl(),
-                    "drawable",
-                    getPackageName()
-            );
-
-            if (resId != 0) {
-                img.setImageResource(resId);
-            }
+            ImageLoader.loadProductImage(this, img, p.getImageUrl());
         }
         btnBack.setOnClickListener(v -> {
             finish();
