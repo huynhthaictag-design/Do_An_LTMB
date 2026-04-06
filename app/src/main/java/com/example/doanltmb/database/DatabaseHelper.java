@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "store.db";
     // Tăng lên 17 để nạp lại toàn bộ dữ liệu ảnh mới từ drawable
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 21;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,15 +36,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // 2. Danh mục
         db.execSQL("INSERT INTO categories(category_name) VALUES ('Điện thoại'), ('Laptop'), ('Phụ kiện')");
 
-        // 3. Nạp sản phẩm khớp với ảnh trong drawable của Thịnh
+
         db.execSQL("INSERT INTO products(product_name, price, image_url, description, category_id) VALUES " +
                 "('iPhone 13 Pro', 18500000, 'iphone13', 'Màn hình Super Retina XDR, chip A15 cực mạnh', 1)," +
                 "('Samsung S23 Ultra', 21900000, 'samsungs23', 'Camera 200MP, S-Pen thần thánh', 1)," +
                 "('MacBook Air M1', 19000000, 'macbookairm1', 'Chip M1 siêu nhanh, pin cả ngày', 2)," +
                 "('Dell XPS 13', 28000000, 'dellxps13', 'Màn hình vô cực, đẳng cấp doanh nhân', 2)," +
-                "('AirPods Pro', 4500000, 'airpodspro', 'Chống ồn chủ động, âm thanh đỉnh cao', 3)");
-    }
+                "('AirPods Pro', 4500000, 'airpodspro', 'Chống ồn chủ động, âm thanh đỉnh cao', 3)," +
 
+                "('iPhone 15 Pro Max', 34990000, 'iphone15pm', 'Khung viền Titan, chip A17 Pro mạnh mẽ nhất', 1)," +
+                "('Samsung Galaxy S24 Ultra', 29990000, 's24ultra', 'Quyền năng Galaxy AI, camera zoom 100x', 1)," +
+                "('Google Pixel 8 Pro', 18500000, 'pixel8pro', 'Trải nghiệm Android thuần khiết, camera AI đỉnh', 1)," +
+                "('Xiaomi 14 Ultra', 25500000, 'xiaomi14u', 'Ống kính Leica thế hệ mới, sạc siêu tốc', 1)," +
+                "('OPPO Find X7 Ultra', 19000000, 'oppofindx7', 'Thiết kế sang trọng, camera tiềm vọng kép', 1)," +
+
+                "('MacBook Pro M3', 39900000, 'macbookm3', 'Hiệu năng đồ họa vượt trội, màn hình ProMotion', 2)," +
+                "('ASUS ROG Strix G16', 31500000, 'rogstrix', 'Laptop Gaming đỉnh cao, tản nhiệt cực mát', 2)," +
+                "('MSI Katana 15', 24000000, 'msikatana', 'Vũ khí chiến game mạnh mẽ cho game thủ', 2)," +
+                "('Lenovo ThinkPad X1 Carbon', 36000000, 'thinkpadx1', 'Bền bỉ chuẩn quân đội, bàn phím gõ cực sướng', 2)," +
+                "('HP Spectre x360', 32000000, 'hpspectre', 'Màn hình OLED xoay gập 360 độ linh hoạt', 2)," +
+
+                "('Tai nghe Sony WH-1000XM5', 7500000, 'sonyxm5', 'Chống ồn tốt nhất thế giới, pin 30 giờ', 3)," +
+                "('Chuột Logitech MX Master 3S', 2400000, 'mxmaster3s', 'Cuộn siêu nhanh, hỗ trợ làm việc đa nhiệm', 3)," +
+                "('Bàn phím cơ Keychron K2', 1900000, 'keychronk2', 'Kết nối không dây, switch cơ gõ cực đã', 3)," +
+                "('Loa Marshall Emberton II', 3900000, 'marshall', 'Âm thanh 360 độ, thiết kế cổ điển sang trọng', 3)," +
+                "('Apple Watch Ultra 2', 20500000, 'watchultra', 'Vỏ Titan bền bỉ, màn hình sáng 3000 nits', 3)");
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int old, int next) {
         if (old < 19) {
@@ -284,5 +301,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this.getWritableDatabase().update("orders", v, "order_id = ?",
                 new String[]{String.valueOf(id)}) > 0;
     }
+    public ArrayList<Product> getProductsByPage(int pageNumber) {
+        ArrayList<Product> list = new ArrayList<>();
+        int pageSize = 8; // Số lượng mỗi trang
+        int offset = (pageNumber - 1) * pageSize; // Vị trí bắt đầu lấy
 
+        SQLiteDatabase db = this.getReadableDatabase();
+        // Lấy 8 sản phẩm, bỏ qua (offset) sản phẩm của các trang trước
+        Cursor c = db.rawQuery("SELECT product_name, price, image_url, description, product_id FROM products LIMIT ? OFFSET ?",
+                new String[]{String.valueOf(pageSize), String.valueOf(offset)});
+
+        while (c.moveToNext()) {
+            Product p = new Product(c.getString(0),
+                    String.format("%,.0fđ", c.getDouble(1)).replace(",", "."),
+                    c.getString(2), c.getString(3));
+            p.setId(c.getInt(4));
+            list.add(p);
+        }
+        c.close();
+        return list;
+    }
 }

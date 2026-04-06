@@ -28,13 +28,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvUsername;
     private EditText edtSearch;
 
-    // Khai báo các biến phục vụ Lọc sản phẩm
+    // Khai báo các biến phục vụ Lọc sản phẩm (Giữ nguyên của Thịnh)
     private View btnFilter;
-    private int selectedCategoryIndex = 0; // Vị trí danh mục đang chọn
-    private int selectedPriceIndex = 0;    // Vị trí mức giá đang chọn
+    private int selectedCategoryIndex = 0;
+    private int selectedPriceIndex = 0;
     private List<String> categoryList;
-    // ĐÂY LÀ BIẾN BẠN BỊ THIẾU
     private String[] priceOptions = {"Tất cả mức giá", "Dưới 10 triệu", "Từ 10 - 20 triệu", "Trên 20 triệu"};
+
+    // --- CODE PHÂN TRANG MỚI ---
+    private int currentPage = 1;
+    private final int totalPages = 3; // 24 sản phẩm / 8 mỗi trang
+    private TextView tvPageInfo;
+    private Button btnPrev, btnNext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +47,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
-        loadProducts();
+        loadProducts(); // Cập nhật để load theo trang
         loadUserInfo();
         setupBottomNavigation();
         setupSearch();
         setupFilter();
+        setupPagination(); // Thiết lập nút bấm
         onResume();
     }
 
@@ -56,14 +62,42 @@ public class MainActivity extends AppCompatActivity {
         edtSearch = findViewById(R.id.edtSearch);
         btnFilter = findViewById(R.id.btnFilter);
 
+        // Ánh xạ nút phân trang
+        tvPageInfo = findViewById(R.id.tvPageInfo);
+        btnPrev = findViewById(R.id.btnPrev);
+        btnNext = findViewById(R.id.btnNext);
+
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         dbHelper = new DatabaseHelper(this);
     }
 
+    // --- LOGIC PHÂN TRANG ---
+    private void setupPagination() {
+        if (btnNext == null || btnPrev == null) return;
+        btnNext.setOnClickListener(v -> {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadProducts();
+            }
+        });
+        btnPrev.setOnClickListener(v -> {
+            if (currentPage > 1) {
+                currentPage--;
+                loadProducts();
+            }
+        });
+    }
+
     private void loadProducts() {
-        List<Product> productList = dbHelper.getAllProductsList();
+        // Sử dụng hàm getProductsByPage mới trong DatabaseHelper
+        List<Product> productList = dbHelper.getProductsByPage(currentPage);
         adapter = new ProductAdapter(this, productList);
         recyclerView.setAdapter(adapter);
+
+        // Cập nhật giao diện nút
+        if(tvPageInfo != null) tvPageInfo.setText("Trang " + currentPage + " / " + totalPages);
+        if(btnPrev != null) btnPrev.setEnabled(currentPage > 1);
+        if(btnNext != null) btnNext.setEnabled(currentPage < totalPages);
     }
 
     private void loadUserInfo() {
@@ -73,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
             Cursor cursor = dbHelper.getUser(username);
             if (cursor != null && cursor.moveToFirst()) {
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-
                 if (tvUsername != null) {
                     tvUsername.setText(name);
                 }
@@ -81,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+        if (bottomNav == null) return;
         bottomNav.setSelectedItemId(R.id.nav_home);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-
-            // Lấy trạng thái đăng nhập từ SharedPreferences
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
 
@@ -104,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (itemId == R.id.nav_cart){
-                // Chặn giỏ hàng nếu chưa đăng nhập
                 if (!isLoggedIn) {
                     Toast.makeText(this, "Vui lòng đăng nhập để xem giỏ hàng!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -115,13 +147,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (itemId == R.id.nav_profile) {
-                // KIỂM TRA ĐĂNG NHẬP Ở ĐÂY
                 if (!isLoggedIn) {
-                    // Nếu chưa đăng nhập -> Chuyển sang trang Login
                     Toast.makeText(this, "Vui lòng đăng nhập để xem tài khoản!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 } else {
-                    // Nếu đã đăng nhập -> Cho phép vào trang Profile
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                 }
                 return true;
@@ -129,30 +158,22 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
     }
+
     private void setupSearch() {
         if (edtSearch == null) return;
-
         edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Đơn giản hóa: Khi gõ chữ, chỉ cần gọi hàm Lọc Tổng Hợp
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 applyCombinedFilters();
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
     }
-    // HÀM HIỂN THỊ HỘP THOẠI LỌC KẾT HỢP
+
     private void setupFilter() {
         if (btnFilter == null) return;
-
         btnFilter.setOnClickListener(v -> {
             categoryList = dbHelper.getAllCategoryNames();
-
             LinearLayout layout = new LinearLayout(MainActivity.this);
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(60, 40, 60, 20);
@@ -184,19 +205,18 @@ public class MainActivity extends AppCompatActivity {
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Bộ lọc sản phẩm");
             builder.setView(layout);
-
             builder.setPositiveButton("Áp dụng", (dialog, which) -> {
                 selectedCategoryIndex = spinnerCategory.getSelectedItemPosition();
                 selectedPriceIndex = spinnerPrice.getSelectedItemPosition();
                 applyCombinedFilters();
             });
-
             builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
             builder.show();
         });
     }
+
+    // --- GIỮ NGUYÊN LOGIC LỌC CỦA THỊNH ---
     private void applyCombinedFilters() {
-        // 1. Lọc theo Danh mục
         List<Product> currentList;
         if (selectedCategoryIndex == 0 || categoryList == null) {
             currentList = dbHelper.getAllProductsList();
@@ -205,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
             currentList = dbHelper.getProductsByCategory(selectedCategoryName);
         }
 
-        // 2. Lọc tiếp bằng Từ khóa
         String keyword = edtSearch != null ? edtSearch.getText().toString().trim().toLowerCase() : "";
         List<Product> searchFilteredList = new ArrayList<>();
         if (!keyword.isEmpty()) {
@@ -217,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
             currentList = searchFilteredList;
         }
 
-        // 3. Lọc tiếp bằng Mức giá
         List<Product> finalFilteredList = new ArrayList<>();
         if (selectedPriceIndex == 0) {
             finalFilteredList.addAll(currentList);
@@ -228,33 +246,28 @@ public class MainActivity extends AppCompatActivity {
                     if (priceStr.isEmpty()) continue;
                     double price = Double.parseDouble(priceStr);
 
-                    if (selectedPriceIndex == 1 && price < 10000000) {
-                        finalFilteredList.add(p);
-                    } else if (selectedPriceIndex == 2 && price >= 10000000 && price <= 20000000) {
-                        finalFilteredList.add(p);
-                    } else if (selectedPriceIndex == 3 && price > 20000000) {
-                        finalFilteredList.add(p);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    if (selectedPriceIndex == 1 && price < 10000000) finalFilteredList.add(p);
+                    else if (selectedPriceIndex == 2 && price >= 10000000 && price <= 20000000) finalFilteredList.add(p);
+                    else if (selectedPriceIndex == 3 && price > 20000000) finalFilteredList.add(p);
+                } catch (Exception e) { e.printStackTrace(); }
             }
         }
 
-        // 4. Cập nhật kết quả lên màn hình
         adapter = new ProductAdapter(MainActivity.this, finalFilteredList);
         recyclerView.setAdapter(adapter);
+
+        // Ẩn thanh phân trang khi đang lọc để tránh rối dữ liệu
+        boolean isSearching = !keyword.isEmpty() || selectedCategoryIndex != 0 || selectedPriceIndex != 0;
+        findViewById(R.id.layoutPagination).setVisibility(isSearching ? View.GONE : View.VISIBLE);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         if (bottomNav != null) {
-            // LƯU Ý: Đảm bảo "nav_main" đúng với ID ở file bottom_nav_menu.xml
             android.view.MenuItem item = bottomNav.getMenu().findItem(R.id.nav_home);
-            if (item != null) {
-                item.setChecked(true);
-            }
+            if (item != null) item.setChecked(true);
         }
     }
 }

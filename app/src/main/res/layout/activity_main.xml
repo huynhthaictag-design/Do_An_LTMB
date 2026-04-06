@@ -11,22 +11,19 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         app:elevation="0dp">
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#FFFFFF">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/c_a_h_ng_i_n_t"
+                android:text="CỬA HÀNG ĐIỆN TỬ"
                 android:textColor="#0056b2"
                 android:textSize="22sp"
                 android:textStyle="bold" />
-
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -39,8 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:paddingBottom="80dp">
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -48,7 +44,6 @@
                 android:layout_marginBottom="24dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -57,47 +52,33 @@
                     app:cardBackgroundColor="#F5F7F8"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal"
                         android:paddingHorizontal="12dp">
-
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@android:drawable/ic_menu_search"
                             app:tint="#888888" />
-
                         <EditText
                             android:id="@+id/edtSearch"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginStart="8dp"
-                            android:autofillHints="@string/timkiemsanpham"
                             android:background="@null"
-                            android:hint="@string/timkiemsanpham"
-                            android:imeOptions="actionSearch"
-                            android:inputType="text"
-                            android:maxLines="1"
-                            android:textColor="#333333"
+                            android:hint="Tìm kiếm sản phẩm..."
                             android:textSize="14sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
-
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnFilter"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="#E6F0FA"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp">
-
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -105,31 +86,49 @@
                         android:src="@android:drawable/ic_menu_sort_by_size"
                         app:tint="#0056b2" />
                 </androidx.cardview.widget.CardView>
-
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sanphammoinhat"
+                android:text="Sản phẩm mới nhất"
                 android:textColor="#333333"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:text="@string/congnghedinhcao"
-                android:textColor="#666666"
-                android:textSize="14sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:nestedScrollingEnabled="false" />
+
+            <LinearLayout
+                android:id="@+id/layoutPagination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="80dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnPrev"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Trước" />
+                <TextView
+                    android:id="@+id/tvPageInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:text="Trang 1 / 3"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sau" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -140,9 +139,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:menu="@menu/bottom_nav_menu"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior" />
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
