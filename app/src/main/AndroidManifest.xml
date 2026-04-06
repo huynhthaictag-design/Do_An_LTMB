@@ -51,5 +51,8 @@
         <activity android:name=".activity.admin.AdminOrderDetailActivity"
             android:exported="false" />
 
+        <activity android:name=".activity.admin.AddCategoryActivity"
+            android:exported="false" />
+
     </application>
 </manifest>

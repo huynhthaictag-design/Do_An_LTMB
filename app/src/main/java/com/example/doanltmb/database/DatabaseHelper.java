@@ -191,7 +191,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return 1;
     }
+    // THÊM DANH MỤC MỚI
+    public boolean addCategory(String categoryName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("category_name", categoryName);
 
+        long result = db.insert("categories", null, values);
+        db.close();
+
+        return result != -1; // Trả về true nếu thêm thành công
+    }
     // ===========================================================
     // 3. GIỎ HÀNG & ĐƠN HÀNG
     // ===========================================================
@@ -274,4 +284,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this.getWritableDatabase().update("orders", v, "order_id = ?",
                 new String[]{String.valueOf(id)}) > 0;
     }
+
 }

@@ -107,6 +107,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/admin_bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -65,6 +65,11 @@ public class AdminMainActivity extends AppCompatActivity {
 
             if (itemId == R.id.nav_home) return true;
 
+            if(itemId == R.id.nav_category){
+                startActivity(new Intent(AdminMainActivity.this, AddCategoryActivity.class));
+                return true;
+            }
+
             if (itemId == R.id.nav_notification) {
                 startActivity(new Intent(AdminMainActivity.this, AdminOrderActivity.class));
                 return true;
