@@ -20,4 +20,6 @@
     <string name="sanphammoinhat">Sản phẩm mới nhất</string>
     <string name="congnghedinhcao">Khám phá công nghệ đỉnh cao</string>
     <string name="title_activity_cart">CartActivity</string>
+    <string name="xin_chao_admin">Xin chào, Admin</string>
+    <string name="string1">Đang quản lý sản phẩm và đơn hàng của cửa hàng.</string>
 </resources>

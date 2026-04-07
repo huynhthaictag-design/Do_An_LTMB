@@ -8,4 +8,16 @@
     <color name="accent_red">#EF4444</color>
     <color name="bottom_nav_color">@color/primary_blue</color>
     <color name="black">#000000</color>
+    <color name="admin_bg">#F4F7FB</color>
+    <color name="admin_surface">#FFFFFF</color>
+    <color name="admin_primary">#0B5B6A</color>
+    <color name="admin_primary_dark">#064553</color>
+    <color name="admin_text">#102033</color>
+    <color name="admin_muted">#7A869A</color>
+    <color name="admin_soft_blue">#EAF3FF</color>
+    <color name="admin_soft_teal">#E5F5F7</color>
+    <color name="admin_soft_red">#FDECEC</color>
+    <color name="admin_blue_text">#2D6CB3</color>
+    <color name="admin_teal_text">#0F766E</color>
+    <color name="admin_red_text">#C0392B</color>
 </resources>

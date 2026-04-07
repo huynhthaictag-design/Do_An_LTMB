@@ -11,12 +11,17 @@
         android:title="Danh mục" />
 
     <item
+        android:id="@+id/nav_add_product"
+        android:icon="@drawable/ic_add_24"
+        android:title="Thêm sản phẩm" />
+
+    <item
         android:id="@+id/nav_notification"
         android:icon="@drawable/ic_notifications"
         android:title="Thông báo" />
 
     <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person_outlined"
-        android:title="Tài khoản" />
+        android:id="@+id/nav_logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="Đăng xuất" />
 </menu>
