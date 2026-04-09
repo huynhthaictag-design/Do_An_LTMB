@@ -174,11 +174,11 @@ public class AdminMainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_home) {
+            if (itemId == R.id.nav_admin_home) {
                 return true;
             }
 
-            if (itemId == R.id.nav_category) {
+            if (itemId == R.id.nav_add_category) {
                 startActivity(new Intent(AdminMainActivity.this, AddCategoryActivity.class));
                 return true;
             }
@@ -188,7 +188,7 @@ public class AdminMainActivity extends AppCompatActivity {
                 return true;
             }
 
-            if (itemId == R.id.nav_notification) {
+            if (itemId == R.id.nav_admin_notification) {
                 startActivity(new Intent(AdminMainActivity.this, AdminOrderActivity.class));
                 return true;
             }
@@ -330,7 +330,7 @@ public class AdminMainActivity extends AppCompatActivity {
             return;
         }
 
-        tvAdminSummary.setText("Đang quản lý " + fullList.size() + " sản phẩm trong cửa hàng.");
+        tvAdminSummary.setText("Đang quản lý " + fullList.size() + " sản phẩm trong cửa hàng   .");
     }
 
     // Cap nhat trang thai nut va thong tin phan trang theo tong so san pham hien tai.
