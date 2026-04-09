@@ -19,12 +19,14 @@
             android:exported="false" />
 
         <activity android:name=".activity.admin.AdminMainActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="false" />
 
         <activity android:name=".activity.admin.AddProductActivity"
             android:exported="false" />
 
         <activity android:name=".activity.user.MainActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="false" />
 
         <activity android:name=".activity.user.ProfileActivity"

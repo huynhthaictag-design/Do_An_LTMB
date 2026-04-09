@@ -1,7 +1,6 @@
 package com.example.doanltmb.activity.user;
 
 import android.content.*;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.text.*;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.*;
 import com.example.doanltmb.model.Product;
+import com.example.doanltmb.model.User;
 import com.example.doanltmb.adapter.ProductAdapter;
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.product.CartActivity;
@@ -104,13 +104,9 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = prefs.getString("currentUsername", "");
         if (!username.isEmpty()) {
-            Cursor cursor = dbHelper.getUser(username);
-            if (cursor != null && cursor.moveToFirst()) {
-                String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-                if (tvUsername != null) {
-                    tvUsername.setText(name);
-                }
-                cursor.close();
+            User user = dbHelper.getUserModel(username);
+            if (user != null && tvUsername != null) {
+                tvUsername.setText(user.getUsername());
             }
         }
     }

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.example.doanltmb.model.Product; // Đảm bảo đã import đúng model
 import com.example.doanltmb.utils.HashUtil;
+import com.example.doanltmb.model.User;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -99,6 +100,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getUser(String u) {
         return this.getReadableDatabase().rawQuery("SELECT * FROM users WHERE username=?", new String[]{u});
+    }
+
+    // Lay thong tin user duoi dang model de cac Activity khong phai doc Cursor thu cong.
+    public User getUserModel(String username) {
+        Cursor cursor = getUser(username);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                return new User(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("username")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("password")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("role")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("phone"))
+                );
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
     }
 
     public boolean checkUser(String u, String p) {

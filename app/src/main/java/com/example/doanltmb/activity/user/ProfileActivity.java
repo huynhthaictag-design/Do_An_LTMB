@@ -2,7 +2,6 @@ package com.example.doanltmb.activity.user;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.LoginActivity;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.model.User;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -92,18 +92,12 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserInfo() {
-
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = prefs.getString("currentUsername", "");
 
-        Cursor cursor = db.getUser(username);
-
-        if (cursor != null && cursor.moveToFirst()) {
-
-            String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-            tvUsername.setText(name);
-
-            cursor.close();
+        User user = db.getUserModel(username);
+        if (user != null) {
+            tvUsername.setText(user.getUsername());
         }
     }
 
