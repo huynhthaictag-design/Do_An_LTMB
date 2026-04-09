@@ -5,9 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.example.doanltmb.model.Product; // Đảm bảo đã import đúng model
-import com.example.doanltmb.utils.HashUtil;
+
+import com.example.doanltmb.model.CartItem;
+import com.example.doanltmb.model.Category;
+import com.example.doanltmb.model.Order;
+import com.example.doanltmb.model.Product;
 import com.example.doanltmb.model.User;
+import com.example.doanltmb.utils.HashUtil;
+
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -81,20 +86,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ===========================================================
-    // 1. QUẢN LÝ TÀI KHOẢN & HỒ SƠ
-    // ===========================================================
     public boolean registerUser(String u, String p) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
-        v.put("username", u); v.put("password", HashUtil.hashPassword(p)); v.put("role", "customer");
+        v.put("username", u);
+        v.put("password", HashUtil.hashPassword(p));
+        v.put("role", "customer");
         return db.insert("users", null, v) != -1;
     }
 
     public boolean updateUserProfile(String username, String name, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
-        v.put("username", name); v.put("phone", phone);
+        v.put("username", name);
+        v.put("phone", phone);
         return db.update("users", v, "username = ?", new String[]{username}) > 0;
     }
 
@@ -102,7 +107,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this.getReadableDatabase().rawQuery("SELECT * FROM users WHERE username=?", new String[]{u});
     }
 
-    // Lay thong tin user duoi dang model de cac Activity khong phai doc Cursor thu cong.
     public User getUserModel(String username) {
         Cursor cursor = getUser(username);
         try {
@@ -124,58 +128,115 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean checkUser(String u, String p) {
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM users WHERE username=? AND password=?", new String[]{u, HashUtil.hashPassword(p)});
-        boolean res = c.getCount() > 0; c.close(); return res;
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT * FROM users WHERE username=? AND password=?",
+                new String[]{u, HashUtil.hashPassword(p)}
+        );
+        boolean res = c.getCount() > 0;
+        c.close();
+        return res;
     }
 
     public String getUserRole(String u) {
         Cursor c = this.getReadableDatabase().rawQuery("SELECT role FROM users WHERE username=?", new String[]{u});
-        String r = c.moveToFirst() ? c.getString(0) : "customer"; c.close(); return r;
+        String r = c.moveToFirst() ? c.getString(0) : "customer";
+        c.close();
+        return r;
     }
 
-    // ===========================================================
-    // 2. QUẢN LÝ SẢN PHẨM & LỌC (ADMIN + USER)
-    // ===========================================================
-    // Lay danh sach ten danh muc de hien thi cho bo loc va form admin.
+    public ArrayList<Category> getAllCategories() {
+        ArrayList<Category> list = new ArrayList<>();
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT category_id, category_name FROM categories ORDER BY category_id",
+                null
+        );
+        try {
+            while (c.moveToNext()) {
+                list.add(new Category(
+                        c.getInt(c.getColumnIndexOrThrow("category_id")),
+                        c.getString(c.getColumnIndexOrThrow("category_name"))
+                ));
+            }
+        } finally {
+            c.close();
+        }
+        return list;
+    }
+
     public ArrayList<String> getAllCategoryNames() {
         ArrayList<String> list = new ArrayList<>();
         list.add("Tất cả danh mục");
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT category_name FROM categories", null);
-        while (c.moveToNext()) list.add(c.getString(0));
-        c.close(); return list;
+        for (Category category : getAllCategories()) {
+            list.add(category.getCategoryName());
+        }
+        return list;
     }
 
     public ArrayList<Product> getProductsByCategory(String categoryName) {
         ArrayList<Product> list = new ArrayList<>();
-        String query = "SELECT p.product_name, p.price, p.image_url, p.description, p.product_id FROM products p INNER JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = ?";
+        String query = "SELECT p.product_name, p.price, p.image_url, p.description, p.product_id " +
+                "FROM products p INNER JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = ?";
         Cursor c = this.getReadableDatabase().rawQuery(query, new String[]{categoryName});
-        while (c.moveToNext()) {
-            Product p = new Product(c.getString(0), String.format("%,.0fđ", c.getDouble(1)).replace(",", "."), c.getString(2), c.getString(3));
-            p.setId(c.getInt(4)); list.add(p);
+        try {
+            while (c.moveToNext()) {
+                Product p = new Product(
+                        c.getString(0),
+                        formatPrice(c.getDouble(1)),
+                        c.getString(2),
+                        c.getString(3)
+                );
+                p.setId(c.getInt(4));
+                list.add(p);
+            }
+        } finally {
+            c.close();
         }
-        c.close(); return list;
+        return list;
     }
 
     public ArrayList<Product> getAllProductsList() {
         ArrayList<Product> list = new ArrayList<>();
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT product_name, price, image_url, description, product_id FROM products", null);
-        while (c.moveToNext()) {
-            Product p = new Product(c.getString(0), String.format("%,.0fđ", c.getDouble(1)).replace(",", "."), c.getString(2), c.getString(3));
-            p.setId(c.getInt(4)); list.add(p);
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT product_name, price, image_url, description, product_id FROM products",
+                null
+        );
+        try {
+            while (c.moveToNext()) {
+                Product p = new Product(
+                        c.getString(0),
+                        formatPrice(c.getDouble(1)),
+                        c.getString(2),
+                        c.getString(3)
+                );
+                p.setId(c.getInt(4));
+                list.add(p);
+            }
+        } finally {
+            c.close();
         }
-        c.close(); return list;
+        return list;
     }
 
     public Product getProductById(int id) {
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT product_name, price, image_url, description FROM products WHERE product_id = ?", new String[]{String.valueOf(id)});
-        if (c.moveToFirst()) {
-            Product p = new Product(c.getString(0), String.format("%,.0fđ", c.getDouble(1)).replace(",", "."), c.getString(2), c.getString(3));
-            c.close(); return p;
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT product_name, price, image_url, description FROM products WHERE product_id = ?",
+                new String[]{String.valueOf(id)}
+        );
+        try {
+            if (c.moveToFirst()) {
+                return new Product(
+                        c.getString(0),
+                        formatPrice(c.getDouble(1)),
+                        c.getString(2),
+                        c.getString(3)
+                );
+            }
+        } finally {
+            c.close();
         }
         return null;
     }
 
-    // Them san pham moi tu form admin voi day du thong tin co the luu duoc.
     public boolean addProduct(String name, double price, String url, String description, String categoryName, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -188,7 +249,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert("products", null, v) != -1;
     }
 
-    // Cap nhat san pham hien co theo du lieu moi trong form admin.
     public int updateProduct(String old, String name, double price, String url, String description, String categoryName, int quantity) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -201,7 +261,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update("products", v, "product_name = ?", new String[]{old});
     }
 
-    // Lay chi tiet san pham de do du lieu len form sua trong man admin.
     public Cursor getProductForEdit(String productName) {
         return this.getReadableDatabase().rawQuery(
                 "SELECT p.product_name, p.description, p.price, p.image_url, p.quantity, c.category_name " +
@@ -214,7 +273,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().delete("products", "product_name = ?", new String[]{name});
     }
 
-    // Tim category_id theo ten danh muc de luu dung khoa ngoai cho san pham.
     private int getCategoryIdByName(String categoryName) {
         Cursor c = this.getReadableDatabase().rawQuery(
                 "SELECT category_id FROM categories WHERE category_name = ?",
@@ -229,7 +287,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return 1;
     }
-    // THÊM DANH MỤC MỚI
+
     public boolean addCategory(String categoryName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -238,20 +296,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long result = db.insert("categories", null, values);
         db.close();
 
-        return result != -1; // Trả về true nếu thêm thành công
+        return result != -1;
     }
-    // ===========================================================
-    // 3. GIỎ HÀNG & ĐƠN HÀNG
-    // ===========================================================
+
     public boolean addToCart(String user, String prod) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
-        v.put("username", user); v.put("product_name", prod); v.put("quantity", 1);
+        v.put("username", user);
+        v.put("product_name", prod);
+        v.put("quantity", 1);
         return db.insert("cart", null, v) != -1;
     }
 
     public void updateCartQuantity(int id, int qty) {
-        ContentValues v = new ContentValues(); v.put("quantity", qty);
+        ContentValues v = new ContentValues();
+        v.put("quantity", qty);
         this.getWritableDatabase().update("cart", v, "cart_id=?", new String[]{String.valueOf(id)});
     }
 
@@ -260,41 +319,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getCartItems(String user) {
-        return this.getReadableDatabase().rawQuery("SELECT c.cart_id, c.product_name, p.price, p.image_url, c.quantity FROM cart c INNER JOIN products p ON c.product_name = p.product_name WHERE c.username=?", new String[]{user});
+        return this.getReadableDatabase().rawQuery(
+                "SELECT c.cart_id, c.product_name, p.price, p.image_url, c.quantity " +
+                        "FROM cart c INNER JOIN products p ON c.product_name = p.product_name WHERE c.username=?",
+                new String[]{user}
+        );
+    }
+
+    public ArrayList<CartItem> getCartItemModels(String user) {
+        ArrayList<CartItem> list = new ArrayList<>();
+        Cursor c = getCartItems(user);
+        try {
+            while (c.moveToNext()) {
+                list.add(new CartItem(
+                        c.getInt(c.getColumnIndexOrThrow("cart_id")),
+                        c.getString(c.getColumnIndexOrThrow("product_name")),
+                        c.getDouble(c.getColumnIndexOrThrow("price")),
+                        c.getString(c.getColumnIndexOrThrow("image_url")),
+                        c.getInt(c.getColumnIndexOrThrow("quantity"))
+                ));
+            }
+        } finally {
+            c.close();
+        }
+        return list;
     }
 
     public boolean checkoutCart(String user) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = getCartItems(user);
+        ArrayList<CartItem> cartItems = getCartItemModels(user);
         db.beginTransaction();
         try {
-            if (c.moveToFirst()) {
-                do {
+            if (!cartItems.isEmpty()) {
+                for (CartItem item : cartItems) {
                     ContentValues v = new ContentValues();
-                    v.put("username", user); v.put("product_name", c.getString(1)); v.put("quantity", c.getInt(4)); v.put("price", c.getDouble(2));
+                    v.put("username", user);
+                    v.put("product_name", item.getProductName());
+                    v.put("quantity", item.getQuantity());
+                    v.put("price", item.getPrice());
                     v.put("status", "Pending");
                     db.insert("orders", null, v);
-                } while (c.moveToNext());
+                }
                 db.delete("cart", "username=?", new String[]{user});
-                db.setTransactionSuccessful(); return true;
+                db.setTransactionSuccessful();
+                return true;
             }
-        } finally { db.endTransaction(); c.close(); }
+        } finally {
+            db.endTransaction();
+        }
         return false;
     }
 
-    public Cursor getAllOrders() {
-        return this.getReadableDatabase().rawQuery(
-                "SELECT * FROM orders WHERE status = 'Pending' ORDER BY order_id DESC", null);
+    public ArrayList<Order> getAllOrders() {
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT * FROM orders WHERE status = 'Pending' ORDER BY order_id DESC",
+                null
+        );
+        return mapOrders(c);
     }
 
-    // Lay danh sach thong bao don hang da duoc cap nhat cho user hien tai.
-    public Cursor getUserNotifications(String username) {
-        return this.getReadableDatabase().rawQuery(
+    public ArrayList<Order> getUserNotifications(String username) {
+        Cursor c = this.getReadableDatabase().rawQuery(
                 "SELECT * FROM orders WHERE username = ? AND status != 'Pending' AND is_hidden = 0 ORDER BY order_id DESC",
-                new String[]{username});
+                new String[]{username}
+        );
+        return mapOrders(c);
     }
 
-    // Danh dau thong bao da bi an thay vi xoa han don hang khoi database.
     public boolean hideUserNotification(int orderId, String username) {
         ContentValues v = new ContentValues();
         v.put("is_hidden", 1);
@@ -306,41 +397,110 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ) > 0;
     }
 
-    // Lay lich su mua hang da duoc duyet cua user de hien thi trong trang ho so.
-    public Cursor getUserPurchaseHistory(String username) {
-        return this.getReadableDatabase().rawQuery(
-                "SELECT product_name, quantity, price, order_date FROM orders WHERE username = ? AND status = 'Approved' ORDER BY order_date DESC",
-                new String[]{username});
+    public ArrayList<Order> getUserPurchaseHistory(String username) {
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT * FROM orders WHERE username = ? AND status = 'Approved' ORDER BY order_date DESC",
+                new String[]{username}
+        );
+        return mapOrders(c);
     }
 
-    public Cursor getOrderById(int id) {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM orders WHERE order_id = ?", new String[]{String.valueOf(id)});
+    public Order getOrderById(int id) {
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT * FROM orders WHERE order_id = ?",
+                new String[]{String.valueOf(id)}
+        );
+        try {
+            if (c.moveToFirst()) {
+                return mapOrder(c);
+            }
+        } finally {
+            c.close();
+        }
+        return null;
     }
 
     public boolean updateOrderStatus(int id, String s) {
-        ContentValues v = new ContentValues(); v.put("status", s);
-        return this.getWritableDatabase().update("orders", v, "order_id = ?",
-                new String[]{String.valueOf(id)}) > 0;
+        ContentValues v = new ContentValues();
+        v.put("status", s);
+        return this.getWritableDatabase().update(
+                "orders",
+                v,
+                "order_id = ?",
+                new String[]{String.valueOf(id)}
+        ) > 0;
     }
+
     public ArrayList<Product> getProductsByPage(int pageNumber) {
         ArrayList<Product> list = new ArrayList<>();
-        int pageSize = 8; // Số lượng mỗi trang
-        int offset = (pageNumber - 1) * pageSize; // Vị trí bắt đầu lấy
+        int pageSize = 8;
+        int offset = (pageNumber - 1) * pageSize;
 
         SQLiteDatabase db = this.getReadableDatabase();
-        // Lấy 8 sản phẩm, bỏ qua (offset) sản phẩm của các trang trước
-        Cursor c = db.rawQuery("SELECT product_name, price, image_url, description, product_id " +
-                                    "FROM products ORDER BY product_id DESC LIMIT ? OFFSET ?",
-                new String[]{String.valueOf(pageSize), String.valueOf(offset)});
+        Cursor c = db.rawQuery(
+                "SELECT product_name, price, image_url, description, product_id " +
+                        "FROM products ORDER BY product_id DESC LIMIT ? OFFSET ?",
+                new String[]{String.valueOf(pageSize), String.valueOf(offset)}
+        );
 
-        while (c.moveToNext()) {
-            Product p = new Product(c.getString(0),
-                    String.format("%,.0fđ", c.getDouble(1)).replace(",", "."),
-                    c.getString(2), c.getString(3));
-            p.setId(c.getInt(4));
-            list.add(p);
+        try {
+            while (c.moveToNext()) {
+                Product p = new Product(
+                        c.getString(0),
+                        formatPrice(c.getDouble(1)),
+                        c.getString(2),
+                        c.getString(3)
+                );
+                p.setId(c.getInt(4));
+                list.add(p);
+            }
+        } finally {
+            c.close();
         }
-        c.close();
         return list;
+    }
+
+    private ArrayList<Order> mapOrders(Cursor cursor) {
+        ArrayList<Order> list = new ArrayList<>();
+        try {
+            while (cursor.moveToNext()) {
+                list.add(mapOrder(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+        return list;
+    }
+
+    private Order mapOrder(Cursor cursor) {
+        int orderId = getIntSafely(cursor, "order_id");
+        String username = getStringSafely(cursor, "username");
+        String productName = getStringSafely(cursor, "product_name");
+        int quantity = getIntSafely(cursor, "quantity");
+        double price = getDoubleSafely(cursor, "price");
+        String status = getStringSafely(cursor, "status");
+        String orderDate = getStringSafely(cursor, "order_date");
+        boolean hidden = getIntSafely(cursor, "is_hidden") == 1;
+
+        return new Order(orderId, username, productName, quantity, price, status, orderDate, hidden);
+    }
+
+    private int getIntSafely(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return index >= 0 ? cursor.getInt(index) : 0;
+    }
+
+    private double getDoubleSafely(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return index >= 0 ? cursor.getDouble(index) : 0;
+    }
+
+    private String getStringSafely(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return index >= 0 ? cursor.getString(index) : "";
+    }
+
+    private String formatPrice(double price) {
+        return String.format("%,.0fđ", price).replace(",", ".");
     }
 }

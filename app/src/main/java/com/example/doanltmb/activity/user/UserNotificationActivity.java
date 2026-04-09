@@ -2,7 +2,6 @@ package com.example.doanltmb.activity.user;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,18 +17,19 @@ import com.example.doanltmb.activity.LoginActivity;
 import com.example.doanltmb.activity.product.CartActivity;
 import com.example.doanltmb.adapter.UserNotificationAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.model.Order;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.List;
 
 public class UserNotificationActivity extends AppCompatActivity implements UserNotificationAdapter.NotificationActionListener {
 
     private DatabaseHelper dbHelper;
     private UserNotificationAdapter adapter;
-    private RecyclerView recyclerView;
     private TextView tvEmpty;
     private BottomNavigationView bottomNav;
     private String currentUsername;
 
-    // Khoi tao man thong bao, kiem tra dang nhap va nap danh sach thong bao.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +46,7 @@ public class UserNotificationActivity extends AppCompatActivity implements UserN
         currentUsername = prefs.getString("currentUsername", "");
 
         dbHelper = new DatabaseHelper(this);
-        recyclerView = findViewById(R.id.recyclerViewNotifications);
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewNotifications);
         tvEmpty = findViewById(R.id.tvEmptyNotifications);
         bottomNav = findViewById(R.id.bottomNavigation);
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -63,16 +63,15 @@ public class UserNotificationActivity extends AppCompatActivity implements UserN
         loadNotifications();
     }
 
-    // Nap lai thong bao tu database va cap nhat trang thai rong.
     private void loadNotifications() {
-        Cursor cursor = dbHelper.getUserNotifications(currentUsername);
-        adapter.swapCursor(cursor);
-        boolean hasNotifications = cursor != null && cursor.getCount() > 0;
+        List<Order> notifications = dbHelper.getUserNotifications(currentUsername);
+        adapter.swapData(notifications);
+
+        boolean hasNotifications = notifications != null && !notifications.isEmpty();
         tvEmpty.setText(hasNotifications ? "" : "Chưa có thông báo đơn hàng nào.");
         tvEmpty.setVisibility(hasNotifications ? View.GONE : View.VISIBLE);
     }
 
-    // Dieu huong bottom navigation tu man thong bao cua user.
     private void setupBottomNavigation() {
         if (bottomNav == null) return;
 
@@ -104,26 +103,20 @@ public class UserNotificationActivity extends AppCompatActivity implements UserN
         });
     }
 
-    // Tu dong tai lai thong bao moi nhat khi user quay lai man hinh.
     @Override
     protected void onResume() {
         super.onResume();
         loadNotifications();
     }
 
-    // Dong adapter va database de tranh ro ri tai nguyen.
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (adapter != null) {
-            adapter.close();
-        }
         if (dbHelper != null) {
             dbHelper.close();
         }
     }
 
-    // Xu ly an mot thong bao sau khi user dong y xoa.
     @Override
     public void onDeleteNotification(int orderId) {
         boolean deleted = dbHelper.hideUserNotification(orderId, currentUsername);

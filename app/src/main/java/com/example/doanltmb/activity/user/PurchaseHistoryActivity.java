@@ -2,7 +2,6 @@ package com.example.doanltmb.activity.user;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +15,9 @@ import com.example.doanltmb.R;
 import com.example.doanltmb.activity.LoginActivity;
 import com.example.doanltmb.adapter.PurchaseHistoryAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.model.Order;
+
+import java.util.List;
 
 public class PurchaseHistoryActivity extends AppCompatActivity {
 
@@ -24,7 +26,6 @@ public class PurchaseHistoryActivity extends AppCompatActivity {
     private TextView tvEmpty;
     private String currentUsername;
 
-    // Khoi tao man lich su mua hang va chi cho phep user da dang nhap truy cap.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,28 +57,22 @@ public class PurchaseHistoryActivity extends AppCompatActivity {
         loadPurchaseHistory();
     }
 
-    // Nap lich su mua hang da duoc duyet va cap nhat trang thai rong.
     private void loadPurchaseHistory() {
-        Cursor cursor = dbHelper.getUserPurchaseHistory(currentUsername);
-        adapter.swapCursor(cursor);
-        boolean hasItems = cursor != null && cursor.getCount() > 0;
+        List<Order> history = dbHelper.getUserPurchaseHistory(currentUsername);
+        adapter.swapData(history);
+        boolean hasItems = history != null && !history.isEmpty();
         tvEmpty.setVisibility(hasItems ? View.GONE : View.VISIBLE);
     }
 
-    // Tai lai du lieu khi user quay lai man lich su.
     @Override
     protected void onResume() {
         super.onResume();
         loadPurchaseHistory();
     }
 
-    // Dong adapter va database khi activity bi huy.
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (adapter != null) {
-            adapter.close();
-        }
         if (dbHelper != null) {
             dbHelper.close();
         }

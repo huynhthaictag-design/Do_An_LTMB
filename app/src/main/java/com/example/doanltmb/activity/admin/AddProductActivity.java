@@ -19,6 +19,7 @@ import androidx.cardview.widget.CardView;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.model.Category;
 import com.example.doanltmb.utils.ImageLoader;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -88,9 +89,9 @@ public class AddProductActivity extends AppCompatActivity {
 
     // Nap danh sach danh muc tu database vao dropdown trong form admin.
     private void setupCategoryDropdown() {
-        ArrayList<String> categories = db.getAllCategoryNames();
-        if (!categories.isEmpty()) {
-            categories.remove(0);
+        ArrayList<String> categories = new ArrayList<>();
+        for (Category category : db.getAllCategories()) {
+            categories.add(category.getCategoryName());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -183,14 +184,14 @@ public class AddProductActivity extends AppCompatActivity {
 
         if (imageTitle != null) {
             imageTitle.setText(currentImageValue.startsWith("content://")
-                    ? "Da chon anh tu thu vien"
-                    : "Tai len hinh anh dai dien");
+                    ? "Đã chọn ảnh từ thư viện"
+                    : "Tải ln hình ảnh sản phẩm");
         }
 
         if (imageHint != null) {
             imageHint.setText(currentImageValue.startsWith("content://")
-                    ? "Nhan vao day neu ban muon chon lai anh khac"
-                    : "Dinh dang JPG, PNG");
+                    ? "Nhấn vào nếu muốn thay đổi ảnh khác"
+                    : "Định dạng JPG, PNG");
         }
     }
 

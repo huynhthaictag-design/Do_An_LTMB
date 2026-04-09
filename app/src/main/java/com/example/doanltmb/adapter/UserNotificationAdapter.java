@@ -1,7 +1,6 @@
 package com.example.doanltmb.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.model.Order;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserNotificationAdapter extends RecyclerView.Adapter<UserNotificationAdapter.NotificationViewHolder> {
 
@@ -21,74 +24,59 @@ public class UserNotificationAdapter extends RecyclerView.Adapter<UserNotificati
 
     private final Context context;
     private final NotificationActionListener listener;
-    private Cursor cursor;
+    private final List<Order> orders;
 
-    // Khoi tao adapter thong bao va callback xoa thong bao.
-    public UserNotificationAdapter(Context context, Cursor cursor, NotificationActionListener listener) {
+    public UserNotificationAdapter(Context context, List<Order> orders, NotificationActionListener listener) {
         this.context = context;
-        this.cursor = cursor;
         this.listener = listener;
+        this.orders = new ArrayList<>();
+        if (orders != null) {
+            this.orders.addAll(orders);
+        }
     }
 
     @NonNull
     @Override
-    // Tao layout cho tung item thong bao trong danh sach.
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_user_notification, parent, false);
         return new NotificationViewHolder(view);
     }
 
     @Override
-    // Bind noi dung thong bao va gan su kien bam vao item.
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        if (cursor == null || !cursor.moveToPosition(position)) return;
+        Order order = orders.get(position);
 
-        int orderId = cursor.getInt(cursor.getColumnIndexOrThrow("order_id"));
-        String productName = cursor.getString(cursor.getColumnIndexOrThrow("product_name"));
-        String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
-        String orderDate = cursor.getString(cursor.getColumnIndexOrThrow("order_date"));
-
-        if ("Approved".equalsIgnoreCase(status)) {
+        if ("Approved".equalsIgnoreCase(order.getStatus())) {
             holder.tvTitle.setText("Thanh toán thành công");
-            holder.tvMessage.setText("Đơn hàng của bạn đã thanh toán thành công: " + productName);
+            holder.tvMessage.setText("Đơn hàng của bạn đã thanh toán thành công: " + order.getProductName());
             holder.tvStatus.setText("Đã duyệt");
-        } else if ("Cancelled".equalsIgnoreCase(status)) {
+        } else if ("Cancelled".equalsIgnoreCase(order.getStatus())) {
             holder.tvTitle.setText("Đơn hàng bị hủy");
-            holder.tvMessage.setText("Đơn hàng " + productName + " đã bị hủy.");
+            holder.tvMessage.setText("Đơn hàng " + order.getProductName() + " đã bị hủy.");
             holder.tvStatus.setText("Đã hủy");
         } else {
             holder.tvTitle.setText("Cập nhật đơn hàng");
-            holder.tvMessage.setText("Đơn hàng " + productName + " hiện tại: " + status);
-            holder.tvStatus.setText(status);
+            holder.tvMessage.setText("Đơn hàng " + order.getProductName() + " hiện tại: " + order.getStatus());
+            holder.tvStatus.setText(order.getStatus());
         }
 
-        holder.tvTime.setText(orderDate);
-        holder.itemView.setOnClickListener(v -> showDeleteDialog(orderId));
+        holder.tvTime.setText(order.getOrderDate());
+        holder.itemView.setOnClickListener(v -> showDeleteDialog(order.getOrderId()));
     }
 
     @Override
-    // Tra ve so thong bao dang duoc hien thi.
     public int getItemCount() {
-        return cursor == null ? 0 : cursor.getCount();
+        return orders.size();
     }
 
-    // Thay cursor moi sau khi du lieu thay doi va dong cursor cu an toan.
-    public void swapCursor(Cursor newCursor) {
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
+    public void swapData(List<Order> newOrders) {
+        orders.clear();
+        if (newOrders != null) {
+            orders.addAll(newOrders);
         }
-        cursor = newCursor;
         notifyDataSetChanged();
     }
 
-    // Giai phong cursor khi adapter khong con duoc su dung.
-    public void close() {
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-    }
-
-    // Hien hop thoai xac nhan truoc khi an thong bao khoi danh sach user.
     private void showDeleteDialog(int orderId) {
         new AlertDialog.Builder(context)
                 .setTitle("Xóa thông báo")
@@ -103,7 +91,10 @@ public class UserNotificationAdapter extends RecyclerView.Adapter<UserNotificati
     }
 
     static class NotificationViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvMessage, tvTime, tvStatus;
+        TextView tvTitle;
+        TextView tvMessage;
+        TextView tvTime;
+        TextView tvStatus;
 
         NotificationViewHolder(@NonNull View itemView) {
             super(itemView);

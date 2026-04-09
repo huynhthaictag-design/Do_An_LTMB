@@ -1,6 +1,5 @@
 package com.example.doanltmb.activity.admin;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,12 +10,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.doanltmb.R;
 import com.example.doanltmb.database.DatabaseHelper;
+import com.example.doanltmb.model.Order;
 import com.example.doanltmb.utils.NotificationHelper;
 
 public class AdminOrderDetailActivity extends AppCompatActivity {
 
-    private TextView tvDetailUser, tvDetailProduct, tvDetailQty, tvDetailPrice, tvDetailStatus;
-    private Button btnApprove, btnCancel;
+    private TextView tvDetailUser;
+    private TextView tvDetailProduct;
+    private TextView tvDetailQty;
+    private TextView tvDetailPrice;
+    private TextView tvDetailStatus;
+    private Button btnApprove;
+    private Button btnCancel;
     private ImageView btnBack;
     private DatabaseHelper db;
     private int orderId;
@@ -29,14 +34,11 @@ public class AdminOrderDetailActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
         initViews();
 
-        // Lấy ID đơn hàng từ Intent
         orderId = getIntent().getIntExtra("ORDER_ID", -1);
-
         if (orderId != -1) {
             loadOrderDetail();
         }
 
-        // Sự kiện nút bấm
         btnApprove.setOnClickListener(v -> handleAction("Approved"));
         btnCancel.setOnClickListener(v -> handleAction("Cancelled"));
 
@@ -57,32 +59,30 @@ public class AdminOrderDetailActivity extends AppCompatActivity {
     }
 
     private void loadOrderDetail() {
-        Cursor cursor = db.getOrderById(orderId);
-        if (cursor != null && cursor.moveToFirst()) {
-            String user = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-            String product = cursor.getString(cursor.getColumnIndexOrThrow("product_name"));
-            int qty = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
-            double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
-            String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
-
-            tvDetailUser.setText("Khách hàng: " + user);
-            tvDetailProduct.setText("Sản phẩm: " + product);
-            tvDetailQty.setText("Số lượng: " + qty);
-            tvDetailPrice.setText("Tổng tiền: " + String.format("%,.0fđ", price * qty).replace(",", "."));
-            tvDetailStatus.setText("Trạng thái: " + status);
-            cursor.close();
+        Order order = db.getOrderById(orderId);
+        if (order == null) {
+            return;
         }
+
+        tvDetailUser.setText("Khách hàng: " + order.getUsername());
+        tvDetailProduct.setText("Sản phẩm: " + order.getProductName());
+        tvDetailQty.setText("Số lượng: " + order.getQuantity());
+        tvDetailPrice.setText("Tổng tiền: " + String.format("%,.0fđ", order.getTotalPrice()).replace(",", "."));
+        tvDetailStatus.setText("Trạng thái: " + order.getStatus());
     }
 
     private void handleAction(String status) {
         if (db.updateOrderStatus(orderId, status)) {
-            String message = status.equals("Approved") ? "Đơn hàng đã được DUYỆT!" : "Đơn hàng đã bị HỦY!";
+            String message = "Approved".equals(status)
+                    ? "Đơn hàng đã được DUYỆT!"
+                    : "Đơn hàng đã bị HỦY!";
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-
-            // Gửi thông báo thông qua Helper bạn đã tạo
-            NotificationHelper.sendNotification(this, "Cập nhật đơn hàng", "Đơn hàng #" + orderId + " hiện tại: " + status);
-
-            finish(); // Quay lại danh sách đơn hàng
+            NotificationHelper.sendNotification(
+                    this,
+                    "Cập nhật đơn hàng",
+                    "Đơn hàng #" + orderId + " hiện tại: " + status
+            );
+            finish();
         }
     }
 }

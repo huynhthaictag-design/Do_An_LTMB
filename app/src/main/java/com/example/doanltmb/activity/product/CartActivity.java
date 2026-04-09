@@ -2,7 +2,6 @@ package com.example.doanltmb.activity.product;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -21,9 +20,7 @@ import com.example.doanltmb.activity.user.UserNotificationActivity;
 import com.example.doanltmb.adapter.CartAdapter;
 import com.example.doanltmb.database.DatabaseHelper;
 import com.example.doanltmb.model.CartItem;
-// --- IMPORT MỚI ---
 import com.example.doanltmb.utils.NotificationHelper;
-// ------------------
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -34,7 +31,6 @@ public class CartActivity extends AppCompatActivity {
     private ImageView btnBack;
     private Button btnCheckout;
     private BottomNavigationView bottomNav;
-
     private RecyclerView recyclerViewCart;
     private TextView tvTotalPrice;
     private CartAdapter cartAdapter;
@@ -56,7 +52,6 @@ public class CartActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         btnCheckout = findViewById(R.id.btnCheckout);
         bottomNav = findViewById(R.id.bottomNavigation);
-
         recyclerViewCart = findViewById(R.id.recyclerViewCart);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
 
@@ -64,12 +59,7 @@ public class CartActivity extends AppCompatActivity {
         cartItemList = new ArrayList<>();
 
         recyclerViewCart.setLayoutManager(new LinearLayoutManager(this));
-        cartAdapter = new CartAdapter(this, cartItemList, new CartAdapter.CartUpdateListener() {
-            @Override
-            public void onCartUpdated() {
-                loadCartData();
-            }
-        });
+        cartAdapter = new CartAdapter(this, cartItemList, this::loadCartData);
         recyclerViewCart.setAdapter(cartAdapter);
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -80,23 +70,12 @@ public class CartActivity extends AppCompatActivity {
 
     private void loadCartData() {
         cartItemList.clear();
+        List<CartItem> items = dbHelper.getCartItemModels(currentUsername);
+        cartItemList.addAll(items);
+
         double totalPrice = 0;
-
-        Cursor cursor = dbHelper.getCartItems(currentUsername);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int cartId = cursor.getInt(0);
-                String name = cursor.getString(1);
-                double price = cursor.getDouble(2);
-                String imageUrl = cursor.getString(3);
-                int quantity = cursor.getInt(4);
-
-                cartItemList.add(new CartItem(cartId, name, price, imageUrl, quantity));
-                totalPrice += (price * quantity);
-
-            } while (cursor.moveToNext());
-            cursor.close();
+        for (CartItem item : items) {
+            totalPrice += item.getPrice() * item.getQuantity();
         }
 
         cartAdapter.notifyDataSetChanged();
@@ -114,7 +93,7 @@ public class CartActivity extends AppCompatActivity {
 
         if (btnCheckout != null) {
             btnCheckout.setOnClickListener(v -> {
-                if (cartItemList == null || cartItemList.isEmpty()) {
+                if (cartItemList.isEmpty()) {
                     Toast.makeText(CartActivity.this, "Giỏ hàng của bạn đang trống!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -122,13 +101,11 @@ public class CartActivity extends AppCompatActivity {
                 boolean isSuccess = dbHelper.checkoutCart(currentUsername);
 
                 if (isSuccess) {
-                    // --- THÊM LOGIC THÔNG BÁO CHO ADMIN ---
                     NotificationHelper.sendNotification(
                             CartActivity.this,
                             "Đơn hàng mới!",
                             "Thịnh Admin ơi, người dùng " + currentUsername + " vừa đặt hàng kìa!"
                     );
-                    // --------------------------------------
 
                     Toast.makeText(CartActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
                     loadCartData();
@@ -140,7 +117,6 @@ public class CartActivity extends AppCompatActivity {
         }
     }
 
-    // Hien lai bottom navigation neu no dang bi an sau khi user thao tac xong.
     private void showBottomNavIfHidden() {
         if (bottomNav == null) return;
 
@@ -200,7 +176,7 @@ public class CartActivity extends AppCompatActivity {
         super.onResume();
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         if (bottomNav != null) {
-            android.view.MenuItem item = bottomNav.getMenu().findItem(R.id.nav_cart);
+            MenuItem item = bottomNav.getMenu().findItem(R.id.nav_cart);
             if (item != null) {
                 item.setChecked(true);
             }

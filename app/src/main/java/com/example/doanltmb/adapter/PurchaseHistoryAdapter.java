@@ -1,7 +1,6 @@
 package com.example.doanltmb.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,19 +10,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.doanltmb.R;
+import com.example.doanltmb.model.Order;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PurchaseHistoryAdapter extends RecyclerView.Adapter<PurchaseHistoryAdapter.PurchaseHistoryViewHolder> {
 
     private final Context context;
-    private Cursor cursor;
+    private final List<Order> orders;
 
-    // Khoi tao adapter lich su mua hang tu cursor doc trong bang orders.
-    public PurchaseHistoryAdapter(Context context, Cursor cursor) {
+    public PurchaseHistoryAdapter(Context context, List<Order> orders) {
         this.context = context;
-        this.cursor = cursor;
+        this.orders = new ArrayList<>();
+        if (orders != null) {
+            this.orders.addAll(orders);
+        }
     }
 
-    // Tao layout cho tung dong lich su mua hang.
     @NonNull
     @Override
     public PurchaseHistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -31,46 +35,34 @@ public class PurchaseHistoryAdapter extends RecyclerView.Adapter<PurchaseHistory
         return new PurchaseHistoryViewHolder(view);
     }
 
-    // Do du lieu ten san pham, thoi gian, so luong va gia tien len item.
     @Override
     public void onBindViewHolder(@NonNull PurchaseHistoryViewHolder holder, int position) {
-        if (cursor == null || !cursor.moveToPosition(position)) return;
+        Order order = orders.get(position);
 
-        String productName = cursor.getString(cursor.getColumnIndexOrThrow("product_name"));
-        int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
-        double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
-        String orderDate = cursor.getString(cursor.getColumnIndexOrThrow("order_date"));
-
-        holder.tvProductName.setText(productName);
-        holder.tvOrderTime.setText(orderDate);
-        holder.tvQuantity.setText("So luong: " + quantity);
-        holder.tvPrice.setText("Gia tien: " + String.format("%,.0fđ", price * quantity).replace(",", "."));
+        holder.tvProductName.setText(order.getProductName());
+        holder.tvOrderTime.setText(order.getOrderDate());
+        holder.tvQuantity.setText("Số lượng: " + order.getQuantity());
+        holder.tvPrice.setText("Giá tiền: " + String.format("%,.0fđ", order.getTotalPrice()).replace(",", "."));
     }
 
-    // Tra ve so dong lich su hien co.
     @Override
     public int getItemCount() {
-        return cursor == null ? 0 : cursor.getCount();
+        return orders.size();
     }
 
-    // Thay cursor moi va dong cursor cu de tranh leak.
-    public void swapCursor(Cursor newCursor) {
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
+    public void swapData(List<Order> newOrders) {
+        orders.clear();
+        if (newOrders != null) {
+            orders.addAll(newOrders);
         }
-        cursor = newCursor;
         notifyDataSetChanged();
     }
 
-    // Dong cursor khi adapter khong con su dung.
-    public void close() {
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-    }
-
     static class PurchaseHistoryViewHolder extends RecyclerView.ViewHolder {
-        TextView tvProductName, tvOrderTime, tvQuantity, tvPrice;
+        TextView tvProductName;
+        TextView tvOrderTime;
+        TextView tvQuantity;
+        TextView tvPrice;
 
         PurchaseHistoryViewHolder(@NonNull View itemView) {
             super(itemView);
