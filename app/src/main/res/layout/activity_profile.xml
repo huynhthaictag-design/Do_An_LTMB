@@ -27,14 +27,6 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_preferences"
-            app:tint="#0056b2" />
-
-        <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="match_parent"
@@ -73,15 +65,6 @@
                     android:textColor="#333333"
                     android:textSize="34sp"
                     android:textStyle="bold" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:backgroundTint="#E3F2FD"
-                    android:text="Chỉnh sửa hồ sơ"
-                    android:textAllCaps="false"
-                    android:textColor="#0056b2" />
 
             </LinearLayout>
 

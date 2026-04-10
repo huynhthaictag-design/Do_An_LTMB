@@ -23,6 +23,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    // =========================================================================
+    // 1. CORE DATABASE METHODS (KHỞI TẠO & DỮ LIỆU MẪU)
+    // =========================================================================
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, role TEXT, phone TEXT)");
@@ -33,47 +37,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertSampleData(db);
     }
 
-    private void insertSampleData(SQLiteDatabase db) {
-        // 1. Tài khoản mặc định
-        db.execSQL("INSERT INTO users(username, password, role) VALUES ('admin', '" + HashUtil.hashPassword("123123") + "', 'admin')");
-        db.execSQL("INSERT INTO users(username, password, role) VALUES ('tai', '" + HashUtil.hashPassword("123456") + "', 'customer')");
-
-        // 2. Danh mục
-        db.execSQL("INSERT INTO categories(category_name) VALUES ('Điện thoại'), ('Laptop'), ('Phụ kiện')");
-
-
-        db.execSQL("INSERT INTO products(product_name, price, image_url, description, category_id, quantity) VALUES " +
-                "('iPhone 13 Pro', 18500000, 'iphone13', 'Màn hình Super Retina XDR, chip A15 cực mạnh', 1, 12)," +
-                "('Samsung S23 Ultra', 21900000, 'samsungs23', 'Camera 200MP, S-Pen thần thánh', 1, 21)," +
-                "('MacBook Air M1', 19000000, 'macbookairm1', 'Chip M1 siêu nhanh, pin cả ngày', 2, 12)," +
-                "('Dell XPS 13', 28000000, 'dellxps13', 'Màn hình vô cực, đẳng cấp doanh nhân', 2, 32)," +
-                "('AirPods Pro', 4500000, 'airpodspro', 'Chống ồn chủ động, âm thanh đỉnh cao', 3, 23)," +
-
-                "('iPhone 15 Pro Max', 34990000, 'iphone15pm', 'Khung viền Titan, chip A17 Pro mạnh mẽ nhất', 1, 12)," +
-                "('Samsung Galaxy S24 Ultra', 29990000, 's24ultra', 'Quyền năng Galaxy AI, camera zoom 100x', 1, 21)," +
-                "('Google Pixel 8 Pro', 18500000, 'pixel8pro', 'Trải nghiệm Android thuần khiết, camera AI đỉnh', 1, 32)," +
-                "('Xiaomi 14 Ultra', 25500000, 'xiaomi14u', 'Ống kính Leica thế hệ mới, sạc siêu tốc', 1, 14)," +
-                "('OPPO Find X7 Ultra', 19000000, 'oppofindx7', 'Thiết kế sang trọng, camera tiềm vọng kép', 1, 15)," +
-
-                "('MacBook Pro M3', 39900000, 'macbookm3', 'Hiệu năng đồ họa vượt trội, màn hình ProMotion', 2, 14)," +
-                "('ASUS ROG Strix G16', 31500000, 'rogstrix', 'Laptop Gaming đỉnh cao, tản nhiệt cực mát', 2, 12)," +
-                "('MSI Katana 15', 24000000, 'msikatana', 'Vũ khí chiến game mạnh mẽ cho game thủ', 2, 14)," +
-                "('Lenovo ThinkPad X1 Carbon', 36000000, 'thinkpadx1', 'Bền bỉ chuẩn quân đội, bàn phím gõ cực sướng', 2, 17)," +
-                "('HP Spectre x360', 32000000, 'hpspectre', 'Màn hình OLED xoay gập 360 độ linh hoạt', 2, 12)," +
-
-                "('Tai nghe Sony WH-1000XM5', 7500000, 'sonyxm5', 'Chống ồn tốt nhất thế giới, pin 30 giờ', 3, 21)," +
-                "('Chuột Logitech MX Master 3S', 2400000, 'mxmaster3s', 'Cuộn siêu nhanh, hỗ trợ làm việc đa nhiệm', 3, 12)," +
-                "('Bàn phím cơ Keychron K2', 1900000, 'keychronk2', 'Kết nối không dây, switch cơ gõ cực đã', 3, 13)," +
-                "('Loa Marshall Emberton II', 3900000, 'marshall', 'Âm thanh 360 độ, thiết kế cổ điển sang trọng', 3, 14)," +
-                "('Apple Watch Ultra 2', 20500000, 'watchultra', 'Vỏ Titan bền bỉ, màn hình sáng 3000 nits', 3, 15)");
-    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int old, int next) {
         if (old < 19) {
             if (old < 18) {
                 db.execSQL("ALTER TABLE orders ADD COLUMN is_hidden INTEGER DEFAULT 0");
             }
-
             db.execSQL("ALTER TABLE products ADD COLUMN quantity INTEGER DEFAULT 0");
             return;
         }
@@ -86,6 +55,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    private void insertSampleData(SQLiteDatabase db) {
+        // Tài khoản mặc định
+        db.execSQL("INSERT INTO users(username, password, role) VALUES ('admin', '" + HashUtil.hashPassword("123123") + "', 'admin')");
+        db.execSQL("INSERT INTO users(username, password, role) VALUES ('tai', '" + HashUtil.hashPassword("123456") + "', 'customer')");
+
+        // Danh mục
+        db.execSQL("INSERT INTO categories(category_name) VALUES ('Điện thoại'), ('Laptop'), ('Phụ kiện')");
+
+        // Sản phẩm
+        db.execSQL("INSERT INTO products(product_name, price, image_url, description, category_id, quantity) VALUES " +
+                "('iPhone 13 Pro', 18500000, 'iphone13', 'Màn hình Super Retina XDR, chip A15 cực mạnh', 1, 12)," +
+                "('Samsung S23 Ultra', 21900000, 'samsungs23', 'Camera 200MP, S-Pen thần thánh', 1, 21)," +
+                "('MacBook Air M1', 19000000, 'macbookairm1', 'Chip M1 siêu nhanh, pin cả ngày', 2, 12)," +
+                "('Dell XPS 13', 28000000, 'dellxps13', 'Màn hình vô cực, đẳng cấp doanh nhân', 2, 32)," +
+                "('AirPods Pro', 4500000, 'airpodspro', 'Chống ồn chủ động, âm thanh đỉnh cao', 3, 23)," +
+                "('iPhone 15 Pro Max', 34990000, 'iphone15pm', 'Khung viền Titan, chip A17 Pro mạnh mẽ nhất', 1, 12)," +
+                "('Samsung Galaxy S24 Ultra', 29990000, 's24ultra', 'Quyền năng Galaxy AI, camera zoom 100x', 1, 21)," +
+                "('Google Pixel 8 Pro', 18500000, 'pixel8pro', 'Trải nghiệm Android thuần khiết, camera AI đỉnh', 1, 32)," +
+                "('Xiaomi 14 Ultra', 25500000, 'xiaomi14u', 'Ống kính Leica thế hệ mới, sạc siêu tốc', 1, 14)," +
+                "('OPPO Find X7 Ultra', 19000000, 'oppofindx7', 'Thiết kế sang trọng, camera tiềm vọng kép', 1, 15)," +
+                "('MacBook Pro M3', 39900000, 'macbookm3', 'Hiệu năng đồ họa vượt trội, màn hình ProMotion', 2, 14)," +
+                "('ASUS ROG Strix G16', 31500000, 'rogstrix', 'Laptop Gaming đỉnh cao, tản nhiệt cực mát', 2, 12)," +
+                "('MSI Katana 15', 24000000, 'msikatana', 'Vũ khí chiến game mạnh mẽ cho game thủ', 2, 14)," +
+                "('Lenovo ThinkPad X1 Carbon', 36000000, 'thinkpadx1', 'Bền bỉ chuẩn quân đội, bàn phím gõ cực sướng', 2, 17)," +
+                "('HP Spectre x360', 32000000, 'hpspectre', 'Màn hình OLED xoay gập 360 độ linh hoạt', 2, 12)," +
+                "('Tai nghe Sony WH-1000XM5', 7500000, 'sonyxm5', 'Chống ồn tốt nhất thế giới, pin 30 giờ', 3, 21)," +
+                "('Chuột Logitech MX Master 3S', 2400000, 'mxmaster3s', 'Cuộn siêu nhanh, hỗ trợ làm việc đa nhiệm', 3, 12)," +
+                "('Bàn phím cơ Keychron K2', 1900000, 'keychronk2', 'Kết nối không dây, switch cơ gõ cực đã', 3, 13)," +
+                "('Loa Marshall Emberton II', 3900000, 'marshall', 'Âm thanh 360 độ, thiết kế cổ điển sang trọng', 3, 14)," +
+                "('Apple Watch Ultra 2', 20500000, 'watchultra', 'Vỏ Titan bền bỉ, màn hình sáng 3000 nits', 3, 15)");
+    }
+
+    // =========================================================================
+    // 2. USER MANAGEMENT (QUẢN LÝ NGƯỜI DÙNG)
+    // =========================================================================
+
     public boolean registerUser(String u, String p) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -95,12 +100,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert("users", null, v) != -1;
     }
 
-    public boolean updateUserProfile(String username, String name, String phone) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("username", name);
-        v.put("phone", phone);
-        return db.update("users", v, "username = ?", new String[]{username}) > 0;
+    public boolean checkUser(String u, String p) {
+        Cursor c = this.getReadableDatabase().rawQuery(
+                "SELECT * FROM users WHERE username=? AND password=?",
+                new String[]{u, HashUtil.hashPassword(p)}
+        );
+        boolean res = c.getCount() > 0;
+        c.close();
+        return res;
     }
 
     public Cursor getUser(String u) {
@@ -120,21 +127,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 );
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            if (cursor != null) cursor.close();
         }
         return null;
-    }
-
-    public boolean checkUser(String u, String p) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT * FROM users WHERE username=? AND password=?",
-                new String[]{u, HashUtil.hashPassword(p)}
-        );
-        boolean res = c.getCount() > 0;
-        c.close();
-        return res;
     }
 
     public String getUserRole(String u) {
@@ -144,12 +139,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return r;
     }
 
+    // =========================================================================
+    // 3. CATEGORY MANAGEMENT (QUẢN LÝ DANH MỤC)
+    // =========================================================================
+
+    public boolean addCategory(String categoryName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("category_name", categoryName);
+        long result = db.insert("categories", null, values);
+        db.close();
+        return result != -1;
+    }
+
     public ArrayList<Category> getAllCategories() {
         ArrayList<Category> list = new ArrayList<>();
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT category_id, category_name FROM categories ORDER BY category_id",
-                null
-        );
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT category_id, category_name FROM categories ORDER BY category_id", null);
         try {
             while (c.moveToNext()) {
                 list.add(new Category(
@@ -168,6 +173,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         list.add("Tất cả danh mục");
         for (Category category : getAllCategories()) {
             list.add(category.getCategoryName());
+        }
+        return list;
+    }
+
+    private int getCategoryIdByName(String categoryName) {
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT category_id FROM categories WHERE category_name = ?", new String[]{categoryName});
+        try {
+            if (c.moveToFirst()) return c.getInt(0);
+        } finally {
+            c.close();
+        }
+        return 1;
+    }
+
+    // =========================================================================
+    // 4. PRODUCT MANAGEMENT (QUẢN LÝ SẢN PHẨM)
+    // =========================================================================
+
+    public boolean addProduct(String name, double price, String url, String description, String categoryName, int quantity) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("product_name", name);
+        v.put("price", price);
+        v.put("image_url", url);
+        v.put("description", description);
+        v.put("category_id", getCategoryIdByName(categoryName));
+        v.put("quantity", quantity);
+        return db.insert("products", null, v) != -1;
+    }
+
+    public int updateProduct(String old, String name, double price, String url, String description, String categoryName, int quantity) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("product_name", name);
+        v.put("price", price);
+        v.put("image_url", url);
+        v.put("description", description);
+        v.put("category_id", getCategoryIdByName(categoryName));
+        v.put("quantity", quantity);
+        return db.update("products", v, "product_name = ?", new String[]{old});
+    }
+
+    public void deleteProduct(String name) {
+        this.getWritableDatabase().delete("products", "product_name = ?", new String[]{name});
+    }
+
+    public ArrayList<Product> getAllProductsList() {
+        ArrayList<Product> list = new ArrayList<>();
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT product_name, price, image_url, description, product_id, quantity FROM products", null);
+        try {
+            while (c.moveToNext()) {
+                Product p = new Product(
+                        c.getString(0),
+                        formatPrice(c.getDouble(1)),
+                        c.getString(2),
+                        c.getString(3),
+                        c.getInt(5)
+                );
+                p.setId(c.getInt(4));
+                list.add(p);
+            }
+        } finally {
+            c.close();
         }
         return list;
     }
@@ -195,11 +263,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<Product> getAllProductsList() {
+    public ArrayList<Product> getProductsByPage(int pageNumber) {
         ArrayList<Product> list = new ArrayList<>();
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT product_name, price, image_url, description, product_id, quantity FROM products",
-                null
+        int pageSize = 8;
+        int offset = (pageNumber - 1) * pageSize;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT product_name, price, image_url, description, product_id, quantity " +
+                        "FROM products ORDER BY product_id DESC LIMIT ? OFFSET ?",
+                new String[]{String.valueOf(pageSize), String.valueOf(offset)}
         );
         try {
             while (c.moveToNext()) {
@@ -229,7 +302,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     String.format("%,.0fđ", c.getDouble(1)).replace(",", "."),
                     c.getString(2),
                     c.getString(3),
-                    c.getInt(4) // SỬA LỖI: quantity nằm ở vị trí số 4, không phải 5
+                    c.getInt(4)
             );
             p.setId(id);
             c.close();
@@ -237,30 +310,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         c.close();
         return null;
-    }
-
-    public boolean addProduct(String name, double price, String url, String description, String categoryName, int quantity) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("product_name", name);
-        v.put("price", price);
-        v.put("image_url", url);
-        v.put("description", description);
-        v.put("category_id", getCategoryIdByName(categoryName));
-        v.put("quantity", quantity);
-        return db.insert("products", null, v) != -1;
-    }
-
-    public int updateProduct(String old, String name, double price, String url, String description, String categoryName, int quantity) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("product_name", name);
-        v.put("price", price);
-        v.put("image_url", url);
-        v.put("description", description);
-        v.put("category_id", getCategoryIdByName(categoryName));
-        v.put("quantity", quantity);
-        return db.update("products", v, "product_name = ?", new String[]{old});
     }
 
     public Cursor getProductForEdit(String productName) {
@@ -271,53 +320,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    public void deleteProduct(String name) {
-        this.getWritableDatabase().delete("products", "product_name = ?", new String[]{name});
-    }
-
-    private int getCategoryIdByName(String categoryName) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT category_id FROM categories WHERE category_name = ?",
-                new String[]{categoryName}
-        );
-        try {
-            if (c.moveToFirst()) {
-                return c.getInt(0);
-            }
-        } finally {
-            c.close();
-        }
-        return 1;
-    }
-
-    public boolean addCategory(String categoryName) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("category_name", categoryName);
-
-        long result = db.insert("categories", null, values);
-        db.close();
-
-        return result != -1;
-    }
+    // =========================================================================
+    // 5. CART MANAGEMENT (QUẢN LÝ GIỎ HÀNG)
+    // =========================================================================
 
     public boolean addToCart(String username, String productName) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // 1. Kiểm tra tồn kho
         Cursor pc = db.rawQuery("SELECT quantity FROM products WHERE product_name = ?", new String[]{productName});
         int stock = 0;
         if (pc.moveToFirst()) stock = pc.getInt(0);
         pc.close();
         if (stock <= 0) return false;
 
-        // 2. Kiểm tra số lượng hiện tại trong giỏ
-        Cursor cc = db.rawQuery("SELECT quantity FROM cart WHERE username = ? AND product_name = ?",
-                new String[]{username, productName});
+        Cursor cc = db.rawQuery("SELECT quantity FROM cart WHERE username = ? AND product_name = ?", new String[]{username, productName});
         if (cc.moveToFirst()) {
             int currentInCart = cc.getInt(0);
             cc.close();
-            if (currentInCart + 1 > stock) return false; // Vượt tồn kho
+            if (currentInCart + 1 > stock) return false;
 
             ContentValues v = new ContentValues();
             v.put("quantity", currentInCart + 1);
@@ -334,7 +354,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean updateCartQuantity(int cartId, int newQty) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         Cursor c = db.rawQuery("SELECT product_name FROM cart WHERE cart_id = ?", new String[]{String.valueOf(cartId)});
         if (c.moveToFirst()) {
             String pName = c.getString(0);
@@ -347,7 +366,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 if (newQty > stock) return false;
             }
         }
-
         ContentValues v = new ContentValues();
         v.put("quantity", newQty);
         return db.update("cart", v, "cart_id = ?", new String[]{String.valueOf(cartId)}) > 0;
@@ -409,50 +427,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
+    // =========================================================================
+    // 6. ORDER MANAGEMENT (QUẢN LÝ ĐƠN HÀNG)
+    // =========================================================================
+
     public ArrayList<Order> getAllOrders() {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT * FROM orders WHERE status = 'Pending' ORDER BY order_id DESC",
-                null
-        );
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM orders WHERE status = 'Pending' ORDER BY order_id DESC", null);
         return mapOrders(c);
     }
 
     public ArrayList<Order> getUserNotifications(String username) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT * FROM orders WHERE username = ? AND status != 'Pending' AND is_hidden = 0 ORDER BY order_id DESC",
-                new String[]{username}
-        );
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM orders WHERE username = ? AND status != 'Pending' AND is_hidden = 0 ORDER BY order_id DESC", new String[]{username});
         return mapOrders(c);
     }
 
-    public boolean hideUserNotification(int orderId, String username) {
-        ContentValues v = new ContentValues();
-        v.put("is_hidden", 1);
-        return this.getWritableDatabase().update(
-                "orders",
-                v,
-                "order_id = ? AND username = ?",
-                new String[]{String.valueOf(orderId), username}
-        ) > 0;
-    }
-
     public ArrayList<Order> getUserPurchaseHistory(String username) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT * FROM orders WHERE username = ? AND status = 'Approved' ORDER BY order_date DESC",
-                new String[]{username}
-        );
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM orders WHERE username = ? AND status = 'Approved' ORDER BY order_date DESC", new String[]{username});
         return mapOrders(c);
     }
 
     public Order getOrderById(int id) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT * FROM orders WHERE order_id = ?",
-                new String[]{String.valueOf(id)}
-        );
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT * FROM orders WHERE order_id = ?", new String[]{String.valueOf(id)});
         try {
-            if (c.moveToFirst()) {
-                return mapOrder(c);
-            }
+            if (c.moveToFirst()) return mapOrder(c);
         } finally {
             c.close();
         }
@@ -464,8 +461,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             if ("Approved".equals(status)) {
-                Cursor c = db.rawQuery("SELECT product_name, quantity FROM orders WHERE order_id = ?",
-                        new String[]{String.valueOf(orderId)});
+                Cursor c = db.rawQuery("SELECT product_name, quantity FROM orders WHERE order_id = ?", new String[]{String.valueOf(orderId)});
                 if (c.moveToFirst()) {
                     String pName = c.getString(0);
                     int orderQty = c.getInt(1);
@@ -477,16 +473,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         pc.close();
                         if (stock < orderQty) return false;
 
-                        db.execSQL("UPDATE products SET quantity = quantity - ? WHERE product_name = ?",
-                                new Object[]{orderQty, pName});
+                        db.execSQL("UPDATE products SET quantity = quantity - ? WHERE product_name = ?", new Object[]{orderQty, pName});
                     }
                 }
             }
-
             ContentValues v = new ContentValues();
             v.put("status", status);
             db.update("orders", v, "order_id = ?", new String[]{String.valueOf(orderId)});
-
             db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
@@ -496,35 +489,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<Product> getProductsByPage(int pageNumber) {
-        ArrayList<Product> list = new ArrayList<>();
-        int pageSize = 8;
-        int offset = (pageNumber - 1) * pageSize;
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT product_name, price, image_url, description, product_id, quantity " +
-                        "FROM products ORDER BY product_id DESC LIMIT ? OFFSET ?",
-                new String[]{String.valueOf(pageSize), String.valueOf(offset)}
-        );
-
-        try {
-            while (c.moveToNext()) {
-                Product p = new Product(
-                        c.getString(0),
-                        formatPrice(c.getDouble(1)),
-                        c.getString(2),
-                        c.getString(3),
-                        c.getInt(5)
-                );
-                p.setId(c.getInt(4));
-                list.add(p);
-            }
-        } finally {
-            c.close();
-        }
-        return list;
+    public boolean hideUserNotification(int orderId, String username) {
+        ContentValues v = new ContentValues();
+        v.put("is_hidden", 1);
+        return this.getWritableDatabase().update("orders", v, "order_id = ? AND username = ?", new String[]{String.valueOf(orderId), username}) > 0;
     }
+
+    // =========================================================================
+    // 7. UTILITY / HELPER METHODS (CÁC HÀM PHỤ TRỢ)
+    // =========================================================================
 
     private ArrayList<Order> mapOrders(Cursor cursor) {
         ArrayList<Order> list = new ArrayList<>();

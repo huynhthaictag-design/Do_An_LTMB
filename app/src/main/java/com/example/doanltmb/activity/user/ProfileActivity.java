@@ -4,13 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.doanltmb.R;
 import com.example.doanltmb.activity.LoginActivity;
 import com.example.doanltmb.database.DatabaseHelper;
@@ -108,4 +103,5 @@ public class ProfileActivity extends AppCompatActivity {
             db.close(); // ✅ đóng DB
         }
     }
+
 }
