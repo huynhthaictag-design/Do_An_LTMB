@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +25,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     private DatabaseHelper dbHelper;
     private CartUpdateListener listener;
 
-    // Interface để giao tiếp với CartActivity
     public interface CartUpdateListener {
         void onCartUpdated();
     }
@@ -32,7 +33,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         this.context = context;
         this.cartItemList = cartItemList;
         this.listener = listener;
-        this.dbHelper = new DatabaseHelper(context); // Khởi tạo DB để cập nhật
+        this.dbHelper = new DatabaseHelper(context);
     }
 
     @NonNull
@@ -45,7 +46,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItemList.get(position);
-
         holder.tvName.setText(item.getProductName());
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
@@ -54,28 +54,31 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         ImageLoader.loadProductImage(context, holder.imgProduct, item.getImageUrl());
 
-        // BẮT SỰ KIỆN NÚT CỘNG
+        // NÚT CỘNG
         holder.btnPlus.setOnClickListener(v -> {
-            int currentQty = item.getQuantity();
-            int newQty = currentQty + 1;
+            int newQty = item.getQuantity() + 1;
+            boolean success = dbHelper.updateCartQuantity(item.getCartId(), newQty);
 
-            dbHelper.updateCartQuantity(item.getCartId(), newQty); // Cập nhật DB
-            item.setQuantity(newQty); // Cập nhật List
-            notifyItemChanged(position); // Cập nhật giao diện 1 item này
-            listener.onCartUpdated(); // Báo cho Activity tính lại tổng tiền
+            if (success) {
+                item.setQuantity(newQty);
+                notifyItemChanged(position);
+                listener.onCartUpdated();
+            } else {
+                Toast.makeText(context, "Số lượng vượt quá tồn kho!", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // BẮT SỰ KIỆN NÚT TRỪ
+        // NÚT TRỪ
         holder.btnMinus.setOnClickListener(v -> {
             int currentQty = item.getQuantity();
             if (currentQty > 1) {
                 int newQty = currentQty - 1;
+                // Nút trừ thì luôn cập nhật được (không bị lỗi vượt kho)
                 dbHelper.updateCartQuantity(item.getCartId(), newQty);
                 item.setQuantity(newQty);
                 notifyItemChanged(position);
                 listener.onCartUpdated();
             } else {
-                // Nếu số lượng đang là 1 mà bấm trừ -> Xóa luôn
                 dbHelper.deleteCartItem(item.getCartId());
                 cartItemList.remove(position);
                 notifyItemRemoved(position);

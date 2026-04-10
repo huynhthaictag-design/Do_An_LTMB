@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "store.db";
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -174,7 +174,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByCategory(String categoryName) {
         ArrayList<Product> list = new ArrayList<>();
-        String query = "SELECT p.product_name, p.price, p.image_url, p.description, p.product_id " +
+        String query = "SELECT p.product_name, p.price, p.image_url, p.description, p.product_id, p.quantity " +
                 "FROM products p INNER JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = ?";
         Cursor c = this.getReadableDatabase().rawQuery(query, new String[]{categoryName});
         try {
@@ -183,7 +183,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         c.getString(0),
                         formatPrice(c.getDouble(1)),
                         c.getString(2),
-                        c.getString(3)
+                        c.getString(3),
+                        c.getInt(5)
                 );
                 p.setId(c.getInt(4));
                 list.add(p);
@@ -197,7 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Product> getAllProductsList() {
         ArrayList<Product> list = new ArrayList<>();
         Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT product_name, price, image_url, description, product_id FROM products",
+                "SELECT product_name, price, image_url, description, product_id, quantity FROM products",
                 null
         );
         try {
@@ -206,7 +207,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         c.getString(0),
                         formatPrice(c.getDouble(1)),
                         c.getString(2),
-                        c.getString(3)
+                        c.getString(3),
+                        c.getInt(5)
                 );
                 p.setId(c.getInt(4));
                 list.add(p);
@@ -218,22 +220,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Product getProductById(int id) {
-        Cursor c = this.getReadableDatabase().rawQuery(
-                "SELECT product_name, price, image_url, description FROM products WHERE product_id = ?",
-                new String[]{String.valueOf(id)}
-        );
-        try {
-            if (c.moveToFirst()) {
-                return new Product(
-                        c.getString(0),
-                        formatPrice(c.getDouble(1)),
-                        c.getString(2),
-                        c.getString(3)
-                );
-            }
-        } finally {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT product_name, price, image_url, description, quantity FROM products WHERE product_id = ?",
+                new String[]{String.valueOf(id)});
+        if (c.moveToFirst()) {
+            Product p = new Product(
+                    c.getString(0),
+                    String.format("%,.0fđ", c.getDouble(1)).replace(",", "."),
+                    c.getString(2),
+                    c.getString(3),
+                    c.getInt(4) // SỬA LỖI: quantity nằm ở vị trí số 4, không phải 5
+            );
+            p.setId(id);
             c.close();
+            return p;
         }
+        c.close();
         return null;
     }
 
@@ -299,19 +301,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    public boolean addToCart(String user, String prod) {
+    public boolean addToCart(String username, String productName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("username", user);
-        v.put("product_name", prod);
-        v.put("quantity", 1);
-        return db.insert("cart", null, v) != -1;
+
+        // 1. Kiểm tra tồn kho
+        Cursor pc = db.rawQuery("SELECT quantity FROM products WHERE product_name = ?", new String[]{productName});
+        int stock = 0;
+        if (pc.moveToFirst()) stock = pc.getInt(0);
+        pc.close();
+        if (stock <= 0) return false;
+
+        // 2. Kiểm tra số lượng hiện tại trong giỏ
+        Cursor cc = db.rawQuery("SELECT quantity FROM cart WHERE username = ? AND product_name = ?",
+                new String[]{username, productName});
+        if (cc.moveToFirst()) {
+            int currentInCart = cc.getInt(0);
+            cc.close();
+            if (currentInCart + 1 > stock) return false; // Vượt tồn kho
+
+            ContentValues v = new ContentValues();
+            v.put("quantity", currentInCart + 1);
+            return db.update("cart", v, "username = ? AND product_name = ?", new String[]{username, productName}) > 0;
+        } else {
+            cc.close();
+            ContentValues v = new ContentValues();
+            v.put("username", username);
+            v.put("product_name", productName);
+            v.put("quantity", 1);
+            return db.insert("cart", null, v) > -1;
+        }
     }
 
-    public void updateCartQuantity(int id, int qty) {
+    public boolean updateCartQuantity(int cartId, int newQty) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor c = db.rawQuery("SELECT product_name FROM cart WHERE cart_id = ?", new String[]{String.valueOf(cartId)});
+        if (c.moveToFirst()) {
+            String pName = c.getString(0);
+            c.close();
+
+            Cursor pc = db.rawQuery("SELECT quantity FROM products WHERE product_name = ?", new String[]{pName});
+            if (pc.moveToFirst()) {
+                int stock = pc.getInt(0);
+                pc.close();
+                if (newQty > stock) return false;
+            }
+        }
+
         ContentValues v = new ContentValues();
-        v.put("quantity", qty);
-        this.getWritableDatabase().update("cart", v, "cart_id=?", new String[]{String.valueOf(id)});
+        v.put("quantity", newQty);
+        return db.update("cart", v, "cart_id = ?", new String[]{String.valueOf(cartId)}) > 0;
     }
 
     public void deleteCartItem(int id) {
@@ -420,15 +459,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public boolean updateOrderStatus(int id, String s) {
-        ContentValues v = new ContentValues();
-        v.put("status", s);
-        return this.getWritableDatabase().update(
-                "orders",
-                v,
-                "order_id = ?",
-                new String[]{String.valueOf(id)}
-        ) > 0;
+    public boolean updateOrderStatus(int orderId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            if ("Approved".equals(status)) {
+                Cursor c = db.rawQuery("SELECT product_name, quantity FROM orders WHERE order_id = ?",
+                        new String[]{String.valueOf(orderId)});
+                if (c.moveToFirst()) {
+                    String pName = c.getString(0);
+                    int orderQty = c.getInt(1);
+                    c.close();
+
+                    Cursor pc = db.rawQuery("SELECT quantity FROM products WHERE product_name = ?", new String[]{pName});
+                    if (pc.moveToFirst()) {
+                        int stock = pc.getInt(0);
+                        pc.close();
+                        if (stock < orderQty) return false;
+
+                        db.execSQL("UPDATE products SET quantity = quantity - ? WHERE product_name = ?",
+                                new Object[]{orderQty, pName});
+                    }
+                }
+            }
+
+            ContentValues v = new ContentValues();
+            v.put("status", status);
+            db.update("orders", v, "order_id = ?", new String[]{String.valueOf(orderId)});
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            return false;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public ArrayList<Product> getProductsByPage(int pageNumber) {
@@ -438,7 +503,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(
-                "SELECT product_name, price, image_url, description, product_id " +
+                "SELECT product_name, price, image_url, description, product_id, quantity " +
                         "FROM products ORDER BY product_id DESC LIMIT ? OFFSET ?",
                 new String[]{String.valueOf(pageSize), String.valueOf(offset)}
         );
@@ -449,7 +514,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         c.getString(0),
                         formatPrice(c.getDouble(1)),
                         c.getString(2),
-                        c.getString(3)
+                        c.getString(3),
+                        c.getInt(5)
                 );
                 p.setId(c.getInt(4));
                 list.add(p);

@@ -59,6 +59,7 @@ public class AdminOrderDetailActivity extends AppCompatActivity {
     }
 
     private void loadOrderDetail() {
+        // Cần đảm bảo DatabaseHelper đã có hàm getOrderById trả về Order
         Order order = db.getOrderById(orderId);
         if (order == null) {
             return;
@@ -73,16 +74,22 @@ public class AdminOrderDetailActivity extends AppCompatActivity {
 
     private void handleAction(String status) {
         if (db.updateOrderStatus(orderId, status)) {
-            String message = "Approved".equals(status)
-                    ? "Đơn hàng đã được DUYỆT!"
-                    : "Đơn hàng đã bị HỦY!";
+            String message = "Approved".equals(status) ? "Đã duyệt đơn và trừ kho!" : "Đã hủy đơn!";
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
             NotificationHelper.sendNotification(
                     this,
                     "Cập nhật đơn hàng",
                     "Đơn hàng #" + orderId + " hiện tại: " + status
             );
+
             finish();
+        } else {
+            if ("Approved".equals(status)) {
+                Toast.makeText(this, "LỖI: Không đủ số lượng tồn kho để duyệt đơn này!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Có lỗi xảy ra!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

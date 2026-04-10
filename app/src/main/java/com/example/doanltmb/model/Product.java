@@ -6,12 +6,13 @@ public class Product {
     private String price;
     private String imageUrl;
     private String description;
-
-    public Product(String name, String price, String imageUrl, String description) {
+    private int quantity;
+    public Product(String name, String price, String imageUrl, String description, int quantity) {
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
         this.description = description;
+        this.quantity = quantity;
     }
 
     // Các hàm Getter và Setter để DatabaseHelper gọi được
@@ -29,4 +30,7 @@ public class Product {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
 }
